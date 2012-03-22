@@ -24,7 +24,7 @@ public:
     SourceFiles(SrcDirItemModel *nSrcDirModel);
     void add(QString path, int dirIndex);
     bool isEmpty();
-    void getRndFile(QString &srcPath, QString &dstPath);
+    void getFile(QString &srcPath, QString &dstPath, bool randMode);
     int size();
 };
 

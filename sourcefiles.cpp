@@ -28,10 +28,10 @@ bool SourceFiles::isEmpty() {
     return files.isEmpty();
 }
 
-void SourceFiles::getRndFile(QString &srcPath, QString &dstPath) {
-    int rand = qrand()%files.size();
-    SourceFile *file = files.at(rand);
-    files.remove(rand);
+void SourceFiles::getFile(QString &srcPath, QString &dstPath, bool randMode) {
+    int index = (randMode)? qrand()%files.size(): 0;
+    SourceFile *file = files.at(index);
+    files.remove(index);
     dstPath = srcPath = file->getPath();
     int srcLength = srcDirModel->getDir(file->getIndex()).length();
     dstPath = dstPath.remove(0, srcLength);

@@ -83,6 +83,8 @@ void MainWindow::loadSettings() {
     ui->ignoreGroupBox->setEnabled(settings->value("enignorefilter").toBool());
     loadListWidgetFromString(ui->ignoreListWidget,
                              settings->value("ignorefilter").toString());
+    ui->randOrderCheckBox->setChecked(
+                settings->value("randorder", true).toBool());
     ui->fileCountCheckBox->setChecked(
                 settings->value("enablemaxfilecount").toBool());
     ui->fileCountSpinBox->setEnabled(
@@ -109,6 +111,7 @@ void MainWindow::saveSettings() {
     settings->setValue("extfilter",listWidgetToSting(ui->filterListWidget));
     settings->setValue("enignorefilter", ui->ignoreCheckBox->checkState());
     settings->setValue("ignorefilter",listWidgetToSting(ui->ignoreListWidget));
+    settings->setValue("randorder",ui->randOrderCheckBox->checkState());
     settings->setValue("enablemaxfilecount",
                        ui->fileCountCheckBox->checkState());
     settings->setValue("maxfilecount",ui->fileCountSpinBox->value());
@@ -324,6 +327,7 @@ void MainWindow::startCopy() {
     if (!ui->outDirLineEdit->text().isEmpty()) {
         threadCopy = new ThreadCopy(getOutputDir(),
                                     srcDirModel,
+                                    ui->randOrderCheckBox->checkState(),
                                     ui->filterCheckBox->checkState(),
                                     ui->filterListWidget,
                                     ui->ignoreCheckBox->checkState(),

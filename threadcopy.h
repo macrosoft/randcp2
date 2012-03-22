@@ -16,6 +16,7 @@ private:
     QListWidget *filterListWidget;
     bool enableIgnore;
     QListWidget *ignoreListWidget;
+    bool randMode;
     bool enableFileCount;
     int maxFileCount;
     bool enableMinFreeSpace;
@@ -38,6 +39,7 @@ private:
     bool getStopFlag();
 public:
     ThreadCopy(QString nOutputDir, SrcDirItemModel *pSrcDirModel,
+               bool nRandMode,
                bool enableFilterFlag, QListWidget *pFilterListWidget,
                bool enableIgnoreFlag, QListWidget *pIgnoreListWidget,
                bool enableFileCountFlag, int nMaxFileCount,

@@ -3,15 +3,16 @@
 #include "diskinfo.h"
 
 ThreadCopy::ThreadCopy(QString nOutputDir, SrcDirItemModel *pSrcDirModel,
-                       bool enableFilterFlag, QListWidget *pFilterListWidget,
-                       bool enableIgnoreFlag, QListWidget *pIgnoreListWidget,
-                       bool enableFileCountFlag, int nMaxFileCount,
-                       bool enableMinFreeSpaceFlag, float nMinFreeSpace,
-                       bool enableLimitFlag, float nLimit,
-                       bool enableMaxDstFlag, float nMaxDst,
-                       int nSleep, QObject *parent) :
+                       bool nRandMode, bool enableFilterFlag,
+                       QListWidget *pFilterListWidget, bool enableIgnoreFlag,
+                       QListWidget *pIgnoreListWidget, bool enableFileCountFlag,
+                       int nMaxFileCount, bool enableMinFreeSpaceFlag,
+                       float nMinFreeSpace, bool enableLimitFlag,
+                       float nLimit, bool enableMaxDstFlag,
+                       float nMaxDst, int nSleep, QObject *parent) :
     QThread(parent)
 {
+    randMode = nRandMode;
     outputDir = nOutputDir;
     srcDirModel = pSrcDirModel;
     enableFilter = enableFilterFlag;
@@ -144,7 +145,7 @@ void ThreadCopy::copy() {
     quint64 outDirSize = getDirSize(outputDir);
     while (!sourceFiles->isEmpty()) {
         QString srcFile, dstFile;
-        sourceFiles->getRndFile(srcFile, dstFile);
+        sourceFiles->getFile(srcFile, dstFile, randMode);
         dstFile = outputDir + dstFile;
         QFileInfo dstFileInfo(dstFile);
         if (dstFileInfo.exists())
