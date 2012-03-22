@@ -1,3 +1,4 @@
+#include <QDir>
 #include <QFileInfo>
 #include <QMimeData>
 #include <QUrl>
@@ -58,7 +59,9 @@ bool SrcDirItemModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
     foreach (QUrl url, urlList) {
         QString dirName = url.toLocalFile();
         if (QFileInfo(dirName).isDir())
-            addDir(dirName, getAdditonalPath(dirName, dirLevel));
+            addDir(QDir::toNativeSeparators(dirName),
+                   QDir::toNativeSeparators(
+                       getAdditonalPath(dirName, dirLevel)));
     }
     return true;
 }

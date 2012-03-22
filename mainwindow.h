@@ -41,6 +41,8 @@ private:
     void startCopy();
     void cancelScan();
     void stop();
+    void printFullOutPath(QString addPath);
+    QString getOutputDir();
 public slots:
     void selectOutputDir();
     void selectParentDirLevel(int level);

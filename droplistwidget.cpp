@@ -1,3 +1,4 @@
+#include <QFileInfo>
 #include <QDragEnterEvent>
 #include <QDir>
 #include <QUrl>
@@ -6,6 +7,7 @@
 DropListWidget::DropListWidget(QWidget *parent) :
     QListWidget(parent) {
     setAcceptDrops(true);
+    setDropIndicatorShown(false);
 }
 
 Qt::DropActions DropListWidget::supportedDropActions() const {
@@ -21,6 +23,22 @@ bool DropListWidget::dropMimeData(int index, const QMimeData *data,
     QList<QUrl> urlList = data->urls();
     foreach (QUrl url, urlList) {
         addItem(QDir::toNativeSeparators(url.toLocalFile()));
+    }
+    return true;
+}
+
+DropExtListWidget::DropExtListWidget(QWidget *parent):
+    DropListWidget(parent){
+}
+
+bool DropExtListWidget::dropMimeData(int index, const QMimeData *data,
+                          Qt::DropAction action) {
+    QList<QUrl> urlList = data->urls();
+    foreach (QUrl url, urlList) {
+        QString file = url.toLocalFile();
+        QFileInfo fileInfo(file);
+        if (!fileInfo.isDir())
+            addItem(fileInfo.completeSuffix());
     }
     return true;
 }

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>randcp 2.5</string>
+   <string>randcp 2.5.1</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
    <property name="spacing">
@@ -204,7 +204,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_6">
             <item>
-             <widget class="QListWidget" name="filterListWidget"/>
+             <widget class="DropExtListWidget" name="filterListWidget"/>
             </item>
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -564,6 +564,11 @@
    <class>DropLineEdit</class>
    <extends>QLineEdit</extends>
    <header location="global">droplineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>DropExtListWidget</class>
+   <extends>QListWidget</extends>
+   <header location="global">droplistwidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

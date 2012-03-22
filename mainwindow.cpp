@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
             srcDirModel, SLOT(setDirLevel(int)));
     ui->srcListView->setModel(srcDirModel);
     ui->srcListView->setAcceptDrops(true);
-    ui->srcListView->setDropIndicatorShown(true);
+    ui->srcListView->setDropIndicatorShown(false);
     loadSettings();
     threadCopy = NULL;
     state = READY;
@@ -55,10 +55,8 @@ bool MainWindow::selectSrcDir() {
 
 void MainWindow::refreshParentDirLevel(int level) {
     additionalPath = getAdditonalPath(newSrcDir, level);
-    ui->srcStatusLabel->setText(QDir::toNativeSeparators(
-                                    ui->outDirLineEdit->text()) +
-                                additionalPath +
-                                QDir::separator() + "...");
+    QString outDir = QDir::toNativeSeparators(getOutputDir());
+    printFullOutPath(additionalPath);
 }
 
 void MainWindow::refreshOutPath() {
@@ -140,8 +138,7 @@ void MainWindow::selectSrcDirList(QModelIndex index) {
     newSrcDir = srcDirModel->data(index).toString();
     ui->srcLineEdit->setText(newSrcDir);
     QString path = QDir::fromNativeSeparators(srcDirModel->getPath(index));
-    ui->srcStatusLabel->setText(ui->outDirLineEdit->text() + path +
-                                QDir::separator() + "...");
+    printFullOutPath(path);
     ui->parentDirSpinBox->setEnabled(true);
     ui->parentDirSpinBox->setMaximum(getLevelParentDirs(newSrcDir));
     ui->parentDirSpinBox->setValue(path.count('/'));
@@ -325,7 +322,7 @@ void MainWindow::cancelScan() {
 
 void MainWindow::startCopy() {
     if (!ui->outDirLineEdit->text().isEmpty()) {
-        threadCopy = new ThreadCopy(ui->outDirLineEdit->text(),
+        threadCopy = new ThreadCopy(getOutputDir(),
                                     srcDirModel,
                                     ui->filterCheckBox->checkState(),
                                     ui->filterListWidget,
@@ -398,4 +395,20 @@ void MainWindow::log(QString msg) {
 
 void MainWindow::displayFileQueue(int count) {
     ui->filesLabel->setText(tr("Files in queue: %1").arg(count));
+}
+
+void MainWindow::printFullOutPath(QString addPath) {
+    ui->srcStatusLabel->setText(getOutputDir()+
+                                QDir::toNativeSeparators(addPath) +
+                                QDir::separator() + "...");
+}
+
+
+QString MainWindow::getOutputDir() {
+    QString outDir = ui->outDirLineEdit->text();
+#ifdef Q_OS_WIN
+    if (outDir.length() == 3 and outDir[1] == ':')
+        outDir.remove(2,1);
+#endif
+    return outDir;
 }
