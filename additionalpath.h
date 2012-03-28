@@ -3,7 +3,7 @@
 
 #include <QString>
 
-int getLevelParentDirs(QString path);
 QString getAdditonalPath(QString fullPath, int level);
+int getLevelParentDirs(QString path);
 
 #endif // ADDITIONALPATH_H

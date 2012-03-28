@@ -7,10 +7,10 @@ class DropListWidget : public QListWidget {
     Q_OBJECT
 public:
     explicit DropListWidget(QWidget *parent = 0);
-    virtual Qt::DropActions supportedDropActions() const;
-    virtual QStringList mimeTypes() const;
     virtual bool dropMimeData(int index, const QMimeData *data,
                               Qt::DropAction action);
+    virtual QStringList mimeTypes() const;
+    virtual Qt::DropActions supportedDropActions() const;
 
 signals:
 

@@ -597,40 +597,6 @@
    <header location="global">droplistwidget.h</header>
   </customwidget>
  </customwidgets>
- <tabstops>
-  <tabstop>tabWidget</tabstop>
-  <tabstop>outDirLineEdit</tabstop>
-  <tabstop>outDirBrowseButton</tabstop>
-  <tabstop>srcLineEdit</tabstop>
-  <tabstop>parentDirSpinBox</tabstop>
-  <tabstop>srcListView</tabstop>
-  <tabstop>addSrcButton</tabstop>
-  <tabstop>editSrcButton</tabstop>
-  <tabstop>delSrcButton</tabstop>
-  <tabstop>filterCheckBox</tabstop>
-  <tabstop>filterLineEdit</tabstop>
-  <tabstop>filterListWidget</tabstop>
-  <tabstop>addFilterButton</tabstop>
-  <tabstop>delFilterButton</tabstop>
-  <tabstop>saveButton</tabstop>
-  <tabstop>ignoreCheckBox</tabstop>
-  <tabstop>ignoreListWidget</tabstop>
-  <tabstop>addIgnoreFileButton</tabstop>
-  <tabstop>addDirIgnorButton</tabstop>
-  <tabstop>editIgnoreButton</tabstop>
-  <tabstop>delIgnoreButton</tabstop>
-  <tabstop>fileCountSpinBox</tabstop>
-  <tabstop>freeSpaceSpinBox</tabstop>
-  <tabstop>limitSpinBox</tabstop>
-  <tabstop>maxDstSpinBox</tabstop>
-  <tabstop>fileCountCheckBox</tabstop>
-  <tabstop>minFreeSpaceCheckBox</tabstop>
-  <tabstop>limitCheckBox</tabstop>
-  <tabstop>maxDstCheckBox</tabstop>
-  <tabstop>sleepSpinBox</tabstop>
-  <tabstop>logTextEdit</tabstop>
-  <tabstop>startButton</tabstop>
- </tabstops>
  <resources/>
  <connections>
   <connection>

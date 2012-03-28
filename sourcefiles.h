@@ -1,7 +1,9 @@
 #ifndef SOURCEFILES_H
 #define SOURCEFILES_H
+
 #include <QString>
 #include <QVector>
+
 #include "srcdiritemmodel.h"
 
 class SourceFile
@@ -9,26 +11,28 @@ class SourceFile
 private:
     QString path;
     int dirIndex;
+
 public:
     SourceFile(QString nPath, int nDirIndex);
-    QString getPath();
     int getIndex();
+    QString getPath();
 };
 
 class SourceFiles
 {
 private:
-    SrcDirItemModel *srcDirModel;
     QVector<SourceFile*> files;
+    SrcDirItemModel *srcDirModel;
+
 public:
     SourceFiles(SrcDirItemModel *nSrcDirModel);
     void add(QString path, int dirIndex);
-    bool isEmpty();
+    QString getDstPath(QString path, int index);
     void getFile(QString &srcPath, QString &dstPath, int index);
     void getFirstFile(QString &srcPath, QString &dstPath);
     void getRndFile(QString &srcPath, QString &dstPath);
+    bool isEmpty();
     int size();
-    QString getDstPath(QString path, int index);
 };
 
 #endif // SOURCEFILES_H

@@ -1,18 +1,19 @@
-#include "sourcefiles.h"
 #include <QTime>
+
+#include "sourcefiles.h"
+
 
 SourceFile::SourceFile(QString nPath, int nDirIndex):
     path(nPath),
     dirIndex(nDirIndex) {
 }
 
-QString SourceFile::getPath() {
-    return path;
-}
-
-
 int SourceFile::getIndex() {
     return dirIndex;
+}
+
+QString SourceFile::getPath() {
+    return path;
 }
 
 SourceFiles::SourceFiles(SrcDirItemModel *nSrcDirModel):
@@ -24,9 +25,6 @@ void SourceFiles::add(QString path,int dirIndex) {
     files.append(new SourceFile(path, dirIndex));
 }
 
-bool SourceFiles::isEmpty() {
-    return files.isEmpty();
-}
 
 QString SourceFiles::getDstPath(QString path, int index) {
     int srcLength = srcDirModel->getDir(index).length();
@@ -50,6 +48,10 @@ void SourceFiles::getFirstFile(QString &srcPath, QString &dstPath) {
 void SourceFiles::getRndFile(QString &srcPath, QString &dstPath) {
     int rand = qrand()%files.size();
     getFile(srcPath, dstPath, rand);
+}
+
+bool SourceFiles::isEmpty() {
+    return files.isEmpty();
 }
 
 int SourceFiles::size() {

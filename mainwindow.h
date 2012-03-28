@@ -1,10 +1,11 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QtGui/QListWidget>
-#include <QWidget>
-#include <QSettings>
 #include <QFileInfo>
+#include <QtGui/QListWidget>
+#include <QSettings>
+#include <QWidget>
+
 #include "srcdiritemmodel.h"
 #include "threadcopy.h"
 
@@ -23,58 +24,62 @@ public:
 private:
     enum STATE {READY, SCANING, COPYING};
 
-    int state;
-    Ui::MainWindow *ui;
+    QString additionalPath;
+    QString newSrcDir;
+    QModelIndex selectedIndexSrcList;
     QSettings *settings;
     SrcDirItemModel *srcDirModel;
+    int state;
     ThreadCopy *threadCopy;
-    QString newSrcDir;
-    QString additionalPath;
-    QModelIndex selectedIndexSrcList;
-    void loadSettings();
-    bool selectSrcDir();
+    Ui::MainWindow *ui;
+
+    void cancelScan();
+    QString getLastSelectedIgnoreDir();
+    QString getOutputDir();
     QString listWidgetToSting(QListWidget *lw);
     void loadListWidgetFromString(QListWidget *lw, QString str);
-    QString sizeToStr(quint64 size);
-    QString getLastSelectedIgnoreDir();
+    void loadSettings();
+    void printFullOutPath(QString addPath);
     void refreshParentDirLevel(int level);
     void startCopy();
-    void cancelScan();
+    bool selectSrcDir();
+    QString sizeToStr(quint64 size);
     void stop();
-    void printFullOutPath(QString addPath);
-    QString getOutputDir();
+
 public slots:
-    void selectOutputDir();
-    void selectParentDirLevel(int level);
-    void saveSettings();
-    void addSrcDir();
-    void selectSrcDirList(QModelIndex index);
-    void editSrcDirList();
-    void delSrcDirList();
-    void setEnabledFilter(bool enable);
-    void addFilterExt();
-    void selectFilterExtList();
-    void delFilterExtList();
-    void setEnabledIgnore(bool enable);
-    void addFileIgnoreList();
     void addDirIgnoreList();
-    void selectIngoreList();
+    void addFileIgnoreList();
+    void addFilterExt();
+    void addSrcDir();
+    void delFilterExtList();
     void delIgnoreList();
-    void editIgnoreList();
+    void delSrcDirList();
+    void displayFileQueue(int count);
+    void doneCoping();
     void enableFileCount(bool enable);
     void enableFreeSpace(bool enable);
     void enableLimit(bool enable);
     void enableMaxDst(bool enable);
-    void selectTab(int tabNum);
-    void pressStartButton();
+    void editIgnoreList();
+    void editSrcDirList();
     void log(QString msg);
-    void displayFileQueue(int count);
-    void doneCoping();
-    void updateDiskFreeSpace();
-    void scanFinished();
+    void pressStartButton();
     void refreshOutPath();
+    void saveSettings();
+    void scanFinished();
+    void selectFilterExtList();
+    void selectIngoreList();
+    void selectOutputDir();
+    void selectParentDirLevel(int level);
+    void selectSrcDirList(QModelIndex index);
+    void selectTab(int tabNum);
+    void setEnabledFilter(bool enable);
+    void setEnabledIgnore(bool enable);
+    void updateDiskFreeSpace();
+
 signals:
     void stopThread();
+
 };
 
 #endif // MAINWINDOW_H

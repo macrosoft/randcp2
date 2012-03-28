@@ -1,4 +1,3 @@
-#include "diskinfo.h"
 #include <QDir>
 
 #ifdef Q_OS_WIN
@@ -8,6 +7,8 @@
 #ifdef Q_OS_LINUX
 #include <sys/statvfs.h>
 #endif
+
+#include "diskinfo.h"
 
 quint64 diskSize(QString path) {
     quint64 free_space;

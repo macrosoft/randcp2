@@ -11,37 +11,7 @@
 class ThreadCopy : public QThread
 {
     Q_OBJECT
-private:
-    QString outputDir;
-    bool enableFilter;
-    QHash<QString, bool> outputFiles;
-    QListWidget *filterListWidget;
-    bool enableIgnore;
-    QListWidget *ignoreListWidget;
-    int mode;
-    bool enableFileCount;
-    int maxFileCount;
-    bool enableMinFreeSpace;
-    float minFreeSpace;
-    bool enableLimit;
-    float limit;
-    bool enableMaxDst;
-    float maxDst;
-    SourceFiles *sourceFiles;
-    SrcDirItemModel *srcDirModel;
-    QMutex mutex;
-    int sleepTime;
-    bool stopFlag;
-    void deleteOldFiles();
-    void scan();
-    int scanDir(QString pathDir, int index);
-    void scanOutput(QString pathDir);
-    bool checkFile(QFileInfo file, int index);
-    bool checkFileFilter(QString file);
-    quint64 getDirSize(QString path);
-    void copy();
-    int getSleep();
-    bool getStopFlag();
+
 public:
     enum {SHUFFLE, SYNCHRONIZE};
     ThreadCopy(QString nOutputDir, SrcDirItemModel *pSrcDirModel, int nMode,
@@ -54,15 +24,51 @@ public:
                QObject *parent = 0);
     ~ThreadCopy();
     void run();
-signals:
-    void print(QString);
-    void fileQueueChanged(int);
-    void changeDiskFreeSpace();
-    void scanFinished();
-    void done();
+
+private:
+    bool enableFileCount;
+    bool enableFilter;
+    bool enableIgnore;
+    bool enableLimit;
+    bool enableMaxDst;
+    bool enableMinFreeSpace;
+    QListWidget *filterListWidget;
+    QListWidget *ignoreListWidget;
+    float limit;
+    float maxDst;
+    int maxFileCount;
+    float minFreeSpace;
+    int mode;
+    QMutex mutex;
+    QString outputDir;
+    QHash<QString, bool> outputFiles;
+    SourceFiles *sourceFiles;
+    int sleepTime;
+    SrcDirItemModel *srcDirModel;
+    bool stopFlag;
+
+    bool checkFile(QFileInfo file, int index);
+    bool checkFileFilter(QString file);
+    void copy();
+    void deleteOldFiles();
+    quint64 getDirSize(QString path);
+    int getSleep();
+    bool getStopFlag();
+    void scan();
+    int scanDir(QString pathDir, int index);
+    void scanOutput(QString pathDir);
+
 public slots:
     void setSleep(int nSleep);
     void stop();
+
+signals:
+    void changeDiskFreeSpace();
+    void done();
+    void fileQueueChanged(int);
+    void print(QString);
+    void scanFinished();
+
 };
 
 #endif // THREADCOPY_H

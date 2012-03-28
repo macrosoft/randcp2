@@ -1,10 +1,12 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+
 #include <QFileDialog>
-#include <QSettings>
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QRegExp>
+#include <QSettings>
+
 #include "additionalpath.h"
 #include "diskinfo.h"
 
@@ -29,45 +31,51 @@ MainWindow::~MainWindow() {
     settings->deleteLater();
 }
 
-void MainWindow::selectOutputDir() {
-    QString outputDir = QFileDialog::getExistingDirectory(this,
-                                tr("Select output directory"),
-                                ui->outDirLineEdit->text());
-    if (!outputDir.isEmpty())
-        ui->outDirLineEdit->setText(QDir::toNativeSeparators(outputDir));
+//private
+
+void MainWindow::cancelScan() {
+    log(tr("***Scanning canceled!***"));
+    displayFileQueue(0);
+    emit stopThread();
 }
 
-bool MainWindow::selectSrcDir() {
-    QString dir = QString();
-    if  (selectedIndexSrcList.isValid())
-        dir = srcDirModel->data(selectedIndexSrcList).toString();
-    else
-        dir = srcDirModel->lastDir();
-    QString srcDir = QFileDialog::getExistingDirectory(this,
-                                tr("Select source directory"),dir);
-    if (!srcDir.isEmpty()) {
-        newSrcDir = QDir::toNativeSeparators(srcDir);
-        refreshParentDirLevel(ui->parentDirSpinBox->value());
-        return true;
+QString MainWindow::getLastSelectedIgnoreDir() {
+    int row = ui->ignoreListWidget->currentRow();
+    if (row >= 0)
+        return ui->ignoreListWidget->item(row)->text();
+    else if (ui->ignoreListWidget->count() > 0)
+        return ui->ignoreListWidget->item(
+                    ui->ignoreListWidget->count()-1)->text();
+    return QString();
+}
+
+QString MainWindow::getOutputDir() {
+    QString outDir = ui->outDirLineEdit->text();
+#ifdef Q_OS_WIN
+    if (outDir.length() == 3 and outDir[1] == ':')
+        outDir.remove(2,1);
+#endif
+    return outDir;
+}
+
+QString MainWindow::listWidgetToSting(QListWidget *lw) {
+    QString str = QString();
+    for (int i=0; i < lw->count(); i++) {
+        if (i)
+            str += "////";
+        str += lw->item(i)->text();
     }
-    return false;
+    return str;
 }
 
-void MainWindow::refreshParentDirLevel(int level) {
-    additionalPath = getAdditonalPath(newSrcDir, level);
-    QString outDir = QDir::toNativeSeparators(getOutputDir());
-    printFullOutPath(additionalPath);
-}
-
-void MainWindow::refreshOutPath() {
-    refreshParentDirLevel(ui->parentDirSpinBox->value());
-}
-
-void MainWindow::selectParentDirLevel(int level) {
-    refreshParentDirLevel(level);
-    if (!newSrcDir.isEmpty())
-        srcDirModel->updateDir(newSrcDir, additionalPath,
-                               selectedIndexSrcList);
+void MainWindow::loadListWidgetFromString(QListWidget *lw, QString str) {
+    QStringList list = str.split("////");
+    lw->clear();
+    if (list.count() == 1 && list.at(0).isEmpty())
+        return;
+    for (int i=0; i < list.count(); i++) {
+        lw->addItem(list.at(i));
+    }
 }
 
 void MainWindow::loadSettings() {
@@ -105,224 +113,16 @@ void MainWindow::loadSettings() {
     ui->maxDstSpinBox->setValue(settings->value("maxdst").toDouble());
 }
 
-void MainWindow::saveSettings() {
-    settings->setValue("outdir",ui->outDirLineEdit->text());
-    settings->setValue("srcdir",srcDirModel->serializeDirs());
-    settings->setValue("srcpath",srcDirModel->serializePaths());
-    settings->setValue("enextfilter", ui->filterCheckBox->checkState());
-    settings->setValue("extfilter",listWidgetToSting(ui->filterListWidget));
-    settings->setValue("enignorefilter", ui->ignoreCheckBox->checkState());
-    settings->setValue("ignorefilter",listWidgetToSting(ui->ignoreListWidget));
-    settings->setValue("mode",ui->rndModeRadioButton->isChecked());
-    settings->setValue("enablemaxfilecount",
-                       ui->fileCountCheckBox->checkState());
-    settings->setValue("maxfilecount",ui->fileCountSpinBox->value());
-    settings->setValue("enminfreespace",
-                       ui->minFreeSpaceCheckBox->checkState());
-    settings->setValue("minfreespace",ui->freeSpaceSpinBox->value());
-    settings->setValue("enlimit",
-                       ui->limitCheckBox->checkState());
-    settings->setValue("limit",ui->limitSpinBox->value());
-    settings->setValue("enmaxdst",
-                       ui->maxDstCheckBox->checkState());
-    settings->setValue("maxdst",ui->maxDstSpinBox->value());
-    settings->sync();
+void MainWindow::printFullOutPath(QString addPath) {
+    ui->srcStatusLabel->setText(getOutputDir()+
+                                QDir::toNativeSeparators(addPath) +
+                                QDir::separator() + "...");
 }
 
-void MainWindow::addSrcDir() {
-    if (selectSrcDir()) {
-        srcDirModel->addDir(newSrcDir, additionalPath);
-        ui->srcLineEdit->clear();
-        ui->srcStatusLabel->clear();
-        ui->parentDirSpinBox->setEnabled(false);
-    }
-}
-
-void MainWindow::selectSrcDirList(QModelIndex index) {
-    selectedIndexSrcList = index;
-    newSrcDir = srcDirModel->data(index).toString();
-    ui->srcLineEdit->setText(newSrcDir);
-    QString path = QDir::fromNativeSeparators(srcDirModel->getAdditionalPath(index));
-    printFullOutPath(path);
-    ui->parentDirSpinBox->setEnabled(true);
-    ui->parentDirSpinBox->setMaximum(getLevelParentDirs(newSrcDir));
-    ui->parentDirSpinBox->setValue(path.count('/'));
-    ui->editSrcButton->setEnabled(true);
-    ui->delSrcButton->setEnabled(true);
-}
-
-void MainWindow::editSrcDirList() {
-    if (selectSrcDir()) {
-        srcDirModel->updateDir(newSrcDir, additionalPath,
-                               selectedIndexSrcList);
-        ui->editSrcButton->setEnabled(false);
-        ui->delSrcButton->setEnabled(false);
-    }
-}
-
-void MainWindow::delSrcDirList() {
-    srcDirModel->delDir(selectedIndexSrcList);
-    ui->srcLineEdit->clear();
-    ui->parentDirSpinBox->setValue(0);
-    ui->editSrcButton->setEnabled(false);
-    ui->delSrcButton->setEnabled(false);
-}
-
-void MainWindow::setEnabledFilter(bool enable) {
-    ui->filterGroupBox->setEnabled(enable);
-}
-
-void MainWindow::addFilterExt() {
-    if (!ui->filterLineEdit->text().isEmpty() &&
-            !ui->filterLineEdit->text().count('/')) {
-        ui->filterListWidget->addItem(ui->filterLineEdit->text());
-        ui->filterLineEdit->clear();
-    }
-}
-
-void MainWindow::selectFilterExtList() {
-    ui->delFilterButton->setEnabled(true);
-}
-
-void MainWindow::delFilterExtList() {
-    ui->filterListWidget->takeItem(ui->filterListWidget->currentRow());
-    ui->delFilterButton->setEnabled(false);
-    ui->filterLineEdit->clear();
-}
-
-QString MainWindow::listWidgetToSting(QListWidget *lw) {
-    QString str = QString();
-    for (int i=0; i < lw->count(); i++) {
-        if (i)
-            str += "////";
-        str += lw->item(i)->text();
-    }
-    return str;
-}
-
-void MainWindow::loadListWidgetFromString(QListWidget *lw, QString str) {
-    QStringList list = str.split("////");
-    lw->clear();
-    if (list.count() == 1 && list.at(0).isEmpty())
-        return;
-    for (int i=0; i < list.count(); i++) {
-        lw->addItem(list.at(i));
-    }
-}
-
-void MainWindow::setEnabledIgnore(bool enable) {
-    ui->ignoreGroupBox->setEnabled(enable);
-}
-
-QString MainWindow::getLastSelectedIgnoreDir() {
-    int row = ui->ignoreListWidget->currentRow();
-    if (row >= 0)
-        return ui->ignoreListWidget->item(row)->text();
-    else if (ui->ignoreListWidget->count() > 0)
-        return ui->ignoreListWidget->item(
-                    ui->ignoreListWidget->count()-1)->text();
-    return QString();
-}
-
-void MainWindow::addFileIgnoreList() {
-    QString fileName = QFileDialog::getOpenFileName(this,
-                            tr("Select ignore file"),
-                            getLastSelectedIgnoreDir());
-    if (!fileName.isEmpty())
-        ui->ignoreListWidget->addItem(QDir::toNativeSeparators(fileName));
-}
-
-void MainWindow::addDirIgnoreList() {
-
-    QString ignoreDir = QFileDialog::getExistingDirectory(this,
-                        tr("Select ignore directory"),
-                        getLastSelectedIgnoreDir());
-    if (!ignoreDir.isEmpty()) {
-        ui->ignoreListWidget->addItem(QDir::toNativeSeparators(ignoreDir));
-        ui->delIgnoreButton->setEnabled(false);
-        ui->editIgnoreButton->setEnabled(false);
-    }
-}
-
-void MainWindow::selectIngoreList() {
-    ui->delIgnoreButton->setEnabled(true);
-    ui->editIgnoreButton->setEnabled(true);
-}
-
-void MainWindow::delIgnoreList() {
-    ui->ignoreListWidget->takeItem(ui->ignoreListWidget->currentRow());
-    ui->delIgnoreButton->setEnabled(false);
-    ui->editIgnoreButton->setEnabled(false);
-}
-
-void MainWindow::editIgnoreList() {
-    QString oldPath = ui->ignoreListWidget->currentItem()->text();
-    QFileInfo oldFile(oldPath);
-    QString newPath = QString();
-    if (oldFile.isDir()) {
-        newPath = QFileDialog::getExistingDirectory(this,
-                                    tr("Select ignore directory"),
-                                    oldPath);
-    } else {
-        newPath = QFileDialog::getOpenFileName(this,
-                                tr("Select ignore file"),
-                                oldFile.path());
-    }
-    if (!newPath.isEmpty())
-        ui->ignoreListWidget->currentItem()->setText(
-                    QDir::toNativeSeparators(newPath));
-}
-
-void MainWindow::enableFileCount(bool enable) {
-    ui->fileCountSpinBox->setEnabled(enable);
-}
-
-void MainWindow::enableFreeSpace(bool enable) {
-    ui->freeSpaceSpinBox->setEnabled(enable);
-}
-
-void MainWindow::enableLimit(bool enable) {
-    ui->limitSpinBox->setEnabled(enable);
-}
-
-void MainWindow::enableMaxDst(bool enable) {
-    ui->maxDstSpinBox->setEnabled(enable);
-}
-
-void MainWindow::selectTab(int tabNum) {
-    if (tabNum == 3) {
-        ui->frameBottom->setEnabled(false);
-        updateDiskFreeSpace();
-    } else {
-        ui->frameBottom->setEnabled(true);
-    }
-}
-
-void MainWindow::updateDiskFreeSpace() {
-    QString freeSpace = sizeToStr(diskSize(ui->outDirLineEdit->text()));
-    ui->freeSpaceLabel->setText(tr("Free disk space: ") + freeSpace);
-}
-
-void MainWindow::pressStartButton() {
-    switch (state) {
-        case READY: startCopy();
-        break;
-        case SCANING: cancelScan();
-        break;
-        case COPYING: stop();
-        break;
-    }
-}
-
-void MainWindow::stop() {
-    ui->startButton->setEnabled(false);
-    emit stopThread();
-}
-
-void MainWindow::cancelScan() {
-    log(tr("***Scanning canceled!***"));
-    displayFileQueue(0);
-    emit stopThread();
+void MainWindow::refreshParentDirLevel(int level) {
+    additionalPath = getAdditonalPath(newSrcDir, level);
+    QString outDir = QDir::toNativeSeparators(getOutputDir());
+    printFullOutPath(additionalPath);
 }
 
 void MainWindow::startCopy() {
@@ -368,19 +168,20 @@ void MainWindow::startCopy() {
     }
 }
 
-void MainWindow::scanFinished() {
-    log(tr("Scanning finnished."));
-    ui->startButton->setText(tr("Stop"));
-    state = COPYING;
-}
-
-void MainWindow::doneCoping() {
-    for (int i=0; i < ui->tabWidget->count()-1; i++)
-        ui->tabWidget->setTabEnabled(i, true);
-    ui->startButton->setEnabled(true);
-    ui->startButton->setText(tr("Start"));
-    log(tr("Done!"));
-    state = READY;
+bool MainWindow::selectSrcDir() {
+    QString dir = QString();
+    if  (selectedIndexSrcList.isValid())
+        dir = srcDirModel->data(selectedIndexSrcList).toString();
+    else
+        dir = srcDirModel->lastDir();
+    QString srcDir = QFileDialog::getExistingDirectory(this,
+                                tr("Select source directory"),dir);
+    if (!srcDir.isEmpty()) {
+        newSrcDir = QDir::toNativeSeparators(srcDir);
+        refreshParentDirLevel(ui->parentDirSpinBox->value());
+        return true;
+    }
+    return false;
 }
 
 QString MainWindow::sizeToStr(quint64 size) {
@@ -396,27 +197,234 @@ QString MainWindow::sizeToStr(quint64 size) {
     return QString::number(size) + " b";
 }
 
+void MainWindow::stop() {
+    ui->startButton->setEnabled(false);
+    emit stopThread();
+}
 
-void MainWindow::log(QString msg) {
-    ui->logTextEdit->appendPlainText(msg);
+//public slots
+
+void MainWindow::addDirIgnoreList() {
+
+    QString ignoreDir = QFileDialog::getExistingDirectory(this,
+                        tr("Select ignore directory"),
+                        getLastSelectedIgnoreDir());
+    if (!ignoreDir.isEmpty()) {
+        ui->ignoreListWidget->addItem(QDir::toNativeSeparators(ignoreDir));
+        ui->delIgnoreButton->setEnabled(false);
+        ui->editIgnoreButton->setEnabled(false);
+    }
+}
+
+void MainWindow::addFileIgnoreList() {
+    QString fileName = QFileDialog::getOpenFileName(this,
+                            tr("Select ignore file"),
+                            getLastSelectedIgnoreDir());
+    if (!fileName.isEmpty())
+        ui->ignoreListWidget->addItem(QDir::toNativeSeparators(fileName));
+}
+
+void MainWindow::addFilterExt() {
+    if (!ui->filterLineEdit->text().isEmpty() &&
+            !ui->filterLineEdit->text().count('/')) {
+        ui->filterListWidget->addItem(ui->filterLineEdit->text());
+        ui->filterLineEdit->clear();
+    }
+}
+
+void MainWindow::addSrcDir() {
+    if (selectSrcDir()) {
+        srcDirModel->addDir(newSrcDir, additionalPath);
+        ui->srcLineEdit->clear();
+        ui->srcStatusLabel->clear();
+        ui->parentDirSpinBox->setEnabled(false);
+    }
+}
+
+void MainWindow::delFilterExtList() {
+    ui->filterListWidget->takeItem(ui->filterListWidget->currentRow());
+    ui->delFilterButton->setEnabled(false);
+    ui->filterLineEdit->clear();
+}
+
+void MainWindow::delSrcDirList() {
+    srcDirModel->delDir(selectedIndexSrcList);
+    ui->srcLineEdit->clear();
+    ui->parentDirSpinBox->setValue(0);
+    ui->editSrcButton->setEnabled(false);
+    ui->delSrcButton->setEnabled(false);
 }
 
 void MainWindow::displayFileQueue(int count) {
     ui->filesLabel->setText(tr("Files in queue: %1").arg(count));
 }
 
-void MainWindow::printFullOutPath(QString addPath) {
-    ui->srcStatusLabel->setText(getOutputDir()+
-                                QDir::toNativeSeparators(addPath) +
-                                QDir::separator() + "...");
+void MainWindow::doneCoping() {
+    for (int i=0; i < ui->tabWidget->count()-1; i++)
+        ui->tabWidget->setTabEnabled(i, true);
+    ui->startButton->setEnabled(true);
+    ui->startButton->setText(tr("Start"));
+    log(tr("Done!"));
+    state = READY;
 }
 
-
-QString MainWindow::getOutputDir() {
-    QString outDir = ui->outDirLineEdit->text();
-#ifdef Q_OS_WIN
-    if (outDir.length() == 3 and outDir[1] == ':')
-        outDir.remove(2,1);
-#endif
-    return outDir;
+void MainWindow::enableFileCount(bool enable) {
+    ui->fileCountSpinBox->setEnabled(enable);
 }
+
+void MainWindow::enableFreeSpace(bool enable) {
+    ui->freeSpaceSpinBox->setEnabled(enable);
+}
+
+void MainWindow::enableLimit(bool enable) {
+    ui->limitSpinBox->setEnabled(enable);
+}
+
+void MainWindow::enableMaxDst(bool enable) {
+    ui->maxDstSpinBox->setEnabled(enable);
+}
+
+void MainWindow::editIgnoreList() {
+    QString oldPath = ui->ignoreListWidget->currentItem()->text();
+    QFileInfo oldFile(oldPath);
+    QString newPath = QString();
+    if (oldFile.isDir()) {
+        newPath = QFileDialog::getExistingDirectory(this,
+                                    tr("Select ignore directory"),
+                                    oldPath);
+    } else {
+        newPath = QFileDialog::getOpenFileName(this,
+                                tr("Select ignore file"),
+                                oldFile.path());
+    }
+    if (!newPath.isEmpty())
+        ui->ignoreListWidget->currentItem()->setText(
+                    QDir::toNativeSeparators(newPath));
+}
+
+void MainWindow::editSrcDirList() {
+    if (selectSrcDir()) {
+        srcDirModel->updateDir(newSrcDir, additionalPath,
+                               selectedIndexSrcList);
+        ui->editSrcButton->setEnabled(false);
+        ui->delSrcButton->setEnabled(false);
+    }
+}
+
+void MainWindow::log(QString msg) {
+    ui->logTextEdit->appendPlainText(msg);
+}
+
+void MainWindow::pressStartButton() {
+    switch (state) {
+        case READY: startCopy();
+        break;
+        case SCANING: cancelScan();
+        break;
+        case COPYING: stop();
+        break;
+    }
+}
+
+void MainWindow::refreshOutPath() {
+    refreshParentDirLevel(ui->parentDirSpinBox->value());
+}
+
+void MainWindow::saveSettings() {
+    settings->setValue("outdir",ui->outDirLineEdit->text());
+    settings->setValue("srcdir",srcDirModel->serializeDirs());
+    settings->setValue("srcpath",srcDirModel->serializePaths());
+    settings->setValue("enextfilter", ui->filterCheckBox->checkState());
+    settings->setValue("extfilter",listWidgetToSting(ui->filterListWidget));
+    settings->setValue("enignorefilter", ui->ignoreCheckBox->checkState());
+    settings->setValue("ignorefilter",listWidgetToSting(ui->ignoreListWidget));
+    settings->setValue("mode",ui->rndModeRadioButton->isChecked());
+    settings->setValue("enablemaxfilecount",
+                       ui->fileCountCheckBox->checkState());
+    settings->setValue("maxfilecount",ui->fileCountSpinBox->value());
+    settings->setValue("enminfreespace",
+                       ui->minFreeSpaceCheckBox->checkState());
+    settings->setValue("minfreespace",ui->freeSpaceSpinBox->value());
+    settings->setValue("enlimit",
+                       ui->limitCheckBox->checkState());
+    settings->setValue("limit",ui->limitSpinBox->value());
+    settings->setValue("enmaxdst",
+                       ui->maxDstCheckBox->checkState());
+    settings->setValue("maxdst",ui->maxDstSpinBox->value());
+    settings->sync();
+}
+
+void MainWindow::scanFinished() {
+    log(tr("Scanning finnished."));
+    ui->startButton->setText(tr("Stop"));
+    state = COPYING;
+}
+
+void MainWindow::selectFilterExtList() {
+    ui->delFilterButton->setEnabled(true);
+}
+
+void MainWindow::selectIngoreList() {
+    ui->delIgnoreButton->setEnabled(true);
+    ui->editIgnoreButton->setEnabled(true);
+}
+
+void MainWindow::selectOutputDir() {
+    QString outputDir = QFileDialog::getExistingDirectory(this,
+                                tr("Select output directory"),
+                                ui->outDirLineEdit->text());
+    if (!outputDir.isEmpty())
+        ui->outDirLineEdit->setText(QDir::toNativeSeparators(outputDir));
+}
+
+void MainWindow::selectParentDirLevel(int level) {
+    refreshParentDirLevel(level);
+    if (!newSrcDir.isEmpty())
+        srcDirModel->updateDir(newSrcDir, additionalPath,
+                               selectedIndexSrcList);
+}
+
+void MainWindow::selectSrcDirList(QModelIndex index) {
+    selectedIndexSrcList = index;
+    newSrcDir = srcDirModel->data(index).toString();
+    ui->srcLineEdit->setText(newSrcDir);
+    QString path =
+            QDir::fromNativeSeparators(srcDirModel->getAdditionalPath(index));
+    printFullOutPath(path);
+    ui->parentDirSpinBox->setEnabled(true);
+    ui->parentDirSpinBox->setMaximum(getLevelParentDirs(newSrcDir));
+    ui->parentDirSpinBox->setValue(path.count('/'));
+    ui->editSrcButton->setEnabled(true);
+    ui->delSrcButton->setEnabled(true);
+}
+
+void MainWindow::selectTab(int tabNum) {
+    if (tabNum == 3) {
+        ui->frameBottom->setEnabled(false);
+        updateDiskFreeSpace();
+    } else {
+        ui->frameBottom->setEnabled(true);
+    }
+}
+
+void MainWindow::setEnabledFilter(bool enable) {
+    ui->filterGroupBox->setEnabled(enable);
+}
+
+void MainWindow::setEnabledIgnore(bool enable) {
+    ui->ignoreGroupBox->setEnabled(enable);
+}
+
+void MainWindow::updateDiskFreeSpace() {
+    QString freeSpace = sizeToStr(diskSize(ui->outDirLineEdit->text()));
+    ui->freeSpaceLabel->setText(tr("Free disk space: ") + freeSpace);
+}
+
+//signals
+
+void MainWindow::delIgnoreList() {
+    ui->ignoreListWidget->takeItem(ui->ignoreListWidget->currentRow());
+    ui->delIgnoreButton->setEnabled(false);
+    ui->editIgnoreButton->setEnabled(false);
+}
+

@@ -1,7 +1,8 @@
-#include <QFileInfo>
-#include <QDragEnterEvent>
 #include <QDir>
+#include <QDragEnterEvent>
+#include <QFileInfo>
 #include <QUrl>
+
 #include "droplineedit.h"
 
 DropLineEdit::DropLineEdit(QWidget *parent) :

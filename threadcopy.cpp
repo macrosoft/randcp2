@@ -37,18 +37,7 @@ ThreadCopy::~ThreadCopy() {
     emit done();
 }
 
-void ThreadCopy::deleteOldFiles() {
-    QHashIterator<QString, bool> i(outputFiles);
-    while (i.hasNext()) {
-        if (getStopFlag())
-            return;
-        i.next();
-        emit print(tr("Remove %1").arg(QDir::toNativeSeparators(i.key())));
-        QFile file(i.key());
-        file.remove();
-    }
-    emit print(QString());
-}
+//public
 
 void ThreadCopy::run() {
     sourceFiles = new SourceFiles(srcDirModel);
@@ -78,59 +67,7 @@ void ThreadCopy::run() {
     deleteLater();
 }
 
-void ThreadCopy::scan() {
-    int srcCount = srcDirModel->rowCount();
-    int filesFound = 0;
-    for (int i=0; i<srcCount; i++) {
-        emit print(QString(tr("Scanning directories: %1 of %2")).arg(i+1)
-                   .arg(srcCount).toAscii());
-        emit print(QString(tr("Scanning: %1")).arg(srcDirModel->dirAt(i)));
-        filesFound = scanDir(srcDirModel->dirAt(i), i);
-        emit print(QString(tr("Files found: %1")).arg(filesFound));
-        if (getStopFlag())
-            return;
-    }
-    emit scanFinished();
-}
-
-int ThreadCopy::scanDir(QString pathDir, int index) {
-    if (getStopFlag())
-        return 0;
-    QDir dir(pathDir);
-    int filesFound = 0;
-    QFileInfoList files = dir.entryInfoList(QDir::Files);
-    for (int i = 0; i < files.size(); i++) {
-        QFileInfo f = files.at(i);
-        if (checkFile(f, index)) {
-            sourceFiles->add(f.absoluteFilePath(), index);
-            filesFound++;
-            emit fileQueueChanged(sourceFiles->size());
-        }
-    }
-    QFileInfoList dirs = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
-    for (int i = 0; i < dirs.size(); i++) {
-         QFileInfo d = dirs.at(i);
-         filesFound += scanDir(d.absoluteFilePath(), index);
-    }
-    return filesFound;
-}
-
-void ThreadCopy::scanOutput(QString pathDir) {
-    if (getStopFlag())
-        return;
-    QDir dir(pathDir);
-    QFileInfoList files = dir.entryInfoList(QDir::Files);
-    for (int i = 0; i < files.size(); i++) {
-        QString fileName = files.at(i).absoluteFilePath();
-        if (checkFileFilter(fileName))
-            outputFiles.insert(fileName, true);
-    }
-    QFileInfoList dirs = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
-    for (int i = 0; i < dirs.size(); i++) {
-             QFileInfo d = dirs.at(i);
-             scanOutput(d.absoluteFilePath());
-    }
-}
+//private
 
 bool ThreadCopy::checkFile(QFileInfo file, int index) {
     bool filtred = checkFileFilter(file.absoluteFilePath());
@@ -172,23 +109,6 @@ bool ThreadCopy::checkFileFilter(QString file) {
         }
     }
     return filtred;
-}
-
-quint64 ThreadCopy::getDirSize(QString path) {
-    QDir dir(path);
-    quint64 size = 0;
-    QFileInfoList files = dir.entryInfoList(QDir::Dirs | QDir::Files
-                                            | QDir::NoSymLinks
-                                            | QDir::NoDotAndDotDot);
-    for (int i = 0; i < files.size(); i++) {
-        QFileInfo f = files.at(i);
-        if (f.isDir())
-            size += getDirSize(f.filePath());
-        else
-            size += f.size();
-    }
-
-    return size;
 }
 
 void ThreadCopy::copy() {
@@ -258,9 +178,34 @@ void ThreadCopy::copy() {
     }
 }
 
-void ThreadCopy::setSleep(int nSleep) {
-    QMutexLocker ml(&mutex);
-    sleepTime = nSleep;
+void ThreadCopy::deleteOldFiles() {
+    QHashIterator<QString, bool> i(outputFiles);
+    while (i.hasNext()) {
+        if (getStopFlag())
+            return;
+        i.next();
+        emit print(tr("Remove %1").arg(QDir::toNativeSeparators(i.key())));
+        QFile file(i.key());
+        file.remove();
+    }
+    emit print(QString());
+}
+
+quint64 ThreadCopy::getDirSize(QString path) {
+    QDir dir(path);
+    quint64 size = 0;
+    QFileInfoList files = dir.entryInfoList(QDir::Dirs | QDir::Files
+                                            | QDir::NoSymLinks
+                                            | QDir::NoDotAndDotDot);
+    for (int i = 0; i < files.size(); i++) {
+        QFileInfo f = files.at(i);
+        if (f.isDir())
+            size += getDirSize(f.filePath());
+        else
+            size += f.size();
+    }
+
+    return size;
 }
 
 int ThreadCopy::getSleep() {
@@ -268,10 +213,70 @@ int ThreadCopy::getSleep() {
     return sleepTime;
 }
 
-
 bool ThreadCopy::getStopFlag() {
     QMutexLocker ml(&mutex);
     return stopFlag;
+}
+
+void ThreadCopy::scan() {
+    int srcCount = srcDirModel->rowCount();
+    int filesFound = 0;
+    for (int i=0; i<srcCount; i++) {
+        emit print(QString(tr("Scanning directories: %1 of %2")).arg(i+1)
+                   .arg(srcCount).toAscii());
+        emit print(QString(tr("Scanning: %1")).arg(srcDirModel->dirAt(i)));
+        filesFound = scanDir(srcDirModel->dirAt(i), i);
+        emit print(QString(tr("Files found: %1")).arg(filesFound));
+        if (getStopFlag())
+            return;
+    }
+    emit scanFinished();
+}
+
+int ThreadCopy::scanDir(QString pathDir, int index) {
+    if (getStopFlag())
+        return 0;
+    QDir dir(pathDir);
+    int filesFound = 0;
+    QFileInfoList files = dir.entryInfoList(QDir::Files);
+    for (int i = 0; i < files.size(); i++) {
+        QFileInfo f = files.at(i);
+        if (checkFile(f, index)) {
+            sourceFiles->add(f.absoluteFilePath(), index);
+            filesFound++;
+            emit fileQueueChanged(sourceFiles->size());
+        }
+    }
+    QFileInfoList dirs = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
+    for (int i = 0; i < dirs.size(); i++) {
+         QFileInfo d = dirs.at(i);
+         filesFound += scanDir(d.absoluteFilePath(), index);
+    }
+    return filesFound;
+}
+
+void ThreadCopy::scanOutput(QString pathDir) {
+    if (getStopFlag())
+        return;
+    QDir dir(pathDir);
+    QFileInfoList files = dir.entryInfoList(QDir::Files);
+    for (int i = 0; i < files.size(); i++) {
+        QString fileName = files.at(i).absoluteFilePath();
+        if (checkFileFilter(fileName))
+            outputFiles.insert(fileName, true);
+    }
+    QFileInfoList dirs = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
+    for (int i = 0; i < dirs.size(); i++) {
+             QFileInfo d = dirs.at(i);
+             scanOutput(d.absoluteFilePath());
+    }
+}
+
+//slots
+
+void ThreadCopy::setSleep(int nSleep) {
+    QMutexLocker ml(&mutex);
+    sleepTime = nSleep;
 }
 
 void ThreadCopy::stop() {

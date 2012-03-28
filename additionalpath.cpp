@@ -1,22 +1,6 @@
-#include "additionalpath.h"
 #include <QDir>
 
-int getLevelParentDirs(QString path) {
-    QString stdSepPath = QDir::fromNativeSeparators(path);
-    int countParentDir = stdSepPath.count('/');
-    #ifdef Q_OS_WIN
-    if ((stdSepPath.length() == 3 && stdSepPath[2] == '/') ||
-        (stdSepPath.length() > 2 &&
-         stdSepPath[0] == '/' && stdSepPath[1] == '/'))
-        countParentDir--;
-    #endif
-
-    #ifdef Q_OS_LINUX
-    if (stdSepPath.length() == 1)
-        countParentDir--;
-    #endif
-    return countParentDir;
-}
+#include "additionalpath.h"
 
 QString getAdditonalPath(QString fullPath, int level) {
     if (level) {
@@ -36,4 +20,21 @@ QString getAdditonalPath(QString fullPath, int level) {
     } else {
         return QString();
     }
+}
+
+int getLevelParentDirs(QString path) {
+    QString stdSepPath = QDir::fromNativeSeparators(path);
+    int countParentDir = stdSepPath.count('/');
+    #ifdef Q_OS_WIN
+    if ((stdSepPath.length() == 3 && stdSepPath[2] == '/') ||
+        (stdSepPath.length() > 2 &&
+         stdSepPath[0] == '/' && stdSepPath[1] == '/'))
+        countParentDir--;
+    #endif
+
+    #ifdef Q_OS_LINUX
+    if (stdSepPath.length() == 1)
+        countParentDir--;
+    #endif
+    return countParentDir;
 }

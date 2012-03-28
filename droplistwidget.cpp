@@ -1,21 +1,14 @@
 #include <QFileInfo>
-#include <QDragEnterEvent>
 #include <QDir>
+#include <QDragEnterEvent>
 #include <QUrl>
+
 #include "droplistwidget.h"
 
 DropListWidget::DropListWidget(QWidget *parent) :
     QListWidget(parent) {
     setAcceptDrops(true);
     setDropIndicatorShown(false);
-}
-
-Qt::DropActions DropListWidget::supportedDropActions() const {
-    return Qt::CopyAction;
-}
-
-QStringList DropListWidget::mimeTypes() const {
-    return QStringList("text/uri-list");
 }
 
 bool DropListWidget::dropMimeData(int index, const QMimeData *data,
@@ -25,6 +18,14 @@ bool DropListWidget::dropMimeData(int index, const QMimeData *data,
         addItem(QDir::toNativeSeparators(url.toLocalFile()));
     }
     return true;
+}
+
+QStringList DropListWidget::mimeTypes() const {
+    return QStringList("text/uri-list");
+}
+
+Qt::DropActions DropListWidget::supportedDropActions() const {
+    return Qt::CopyAction;
 }
 
 DropExtListWidget::DropExtListWidget(QWidget *parent):
