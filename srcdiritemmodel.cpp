@@ -73,7 +73,7 @@ void SrcDirItemModel::addDir(QString dir, QString path) {
     emit dataChanged(index,index);
 }
 
-QString SrcDirItemModel::getPath(const QModelIndex &index) const {
+QString SrcDirItemModel::getAdditionalPath(const QModelIndex &index) const {
     return additionalPath.at(index.row());
 }
 
@@ -81,7 +81,7 @@ QString SrcDirItemModel::getDir(const int index) const {
     return dirs.at(index);
 }
 
-QString SrcDirItemModel::getPath(const int index) const {
+QString SrcDirItemModel::getAdditionalPath(const int index) const {
     return additionalPath.at(index);
 }
 

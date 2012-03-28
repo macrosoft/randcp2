@@ -27,8 +27,8 @@ public:
     void addDir(QString dir, QString path);
     void updateDir(QString dir, QString path, const QModelIndex &index);
     void delDir(const QModelIndex &index);
-    QString getPath(const QModelIndex &index) const;
-    QString getPath(const int index) const;
+    QString getAdditionalPath(const QModelIndex &index) const;
+    QString getAdditionalPath(const int index) const;
     QString getDir(const int index) const;
     QString serializeDirs() const;
     QString serializePaths() const;

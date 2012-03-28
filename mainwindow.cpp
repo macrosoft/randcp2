@@ -83,8 +83,10 @@ void MainWindow::loadSettings() {
     ui->ignoreGroupBox->setEnabled(settings->value("enignorefilter").toBool());
     loadListWidgetFromString(ui->ignoreListWidget,
                              settings->value("ignorefilter").toString());
-    ui->randOrderCheckBox->setChecked(
-                settings->value("randorder", true).toBool());
+    if (settings->value("mode", true).toBool())
+        ui->rndModeRadioButton->setChecked(true);
+    else
+        ui->synchModeRadioButto->setChecked(true);
     ui->fileCountCheckBox->setChecked(
                 settings->value("enablemaxfilecount").toBool());
     ui->fileCountSpinBox->setEnabled(
@@ -111,7 +113,7 @@ void MainWindow::saveSettings() {
     settings->setValue("extfilter",listWidgetToSting(ui->filterListWidget));
     settings->setValue("enignorefilter", ui->ignoreCheckBox->checkState());
     settings->setValue("ignorefilter",listWidgetToSting(ui->ignoreListWidget));
-    settings->setValue("randorder",ui->randOrderCheckBox->checkState());
+    settings->setValue("mode",ui->rndModeRadioButton->isChecked());
     settings->setValue("enablemaxfilecount",
                        ui->fileCountCheckBox->checkState());
     settings->setValue("maxfilecount",ui->fileCountSpinBox->value());
@@ -140,7 +142,7 @@ void MainWindow::selectSrcDirList(QModelIndex index) {
     selectedIndexSrcList = index;
     newSrcDir = srcDirModel->data(index).toString();
     ui->srcLineEdit->setText(newSrcDir);
-    QString path = QDir::fromNativeSeparators(srcDirModel->getPath(index));
+    QString path = QDir::fromNativeSeparators(srcDirModel->getAdditionalPath(index));
     printFullOutPath(path);
     ui->parentDirSpinBox->setEnabled(true);
     ui->parentDirSpinBox->setMaximum(getLevelParentDirs(newSrcDir));
@@ -325,9 +327,11 @@ void MainWindow::cancelScan() {
 
 void MainWindow::startCopy() {
     if (!ui->outDirLineEdit->text().isEmpty()) {
+        int mode = ui->rndModeRadioButton->isChecked()? ThreadCopy::SHUFFLE:
+                                                        ThreadCopy::SYNCHRONIZE;
         threadCopy = new ThreadCopy(getOutputDir(),
                                     srcDirModel,
-                                    ui->randOrderCheckBox->checkState(),
+                                    mode,
                                     ui->filterCheckBox->checkState(),
                                     ui->filterListWidget,
                                     ui->ignoreCheckBox->checkState(),

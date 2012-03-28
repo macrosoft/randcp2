@@ -28,15 +28,28 @@ bool SourceFiles::isEmpty() {
     return files.isEmpty();
 }
 
-void SourceFiles::getFile(QString &srcPath, QString &dstPath, bool randMode) {
-    int index = (randMode)? qrand()%files.size(): 0;
+QString SourceFiles::getDstPath(QString path, int index) {
+    int srcLength = srcDirModel->getDir(index).length();
+    QString dstPath =  path.remove(0, srcLength);
+    QString additionalPath = srcDirModel->getAdditionalPath(index);
+    dstPath = additionalPath + dstPath;
+    return dstPath;
+}
+
+void SourceFiles::getFile(QString &srcPath, QString &dstPath, int index) {
     SourceFile *file = files.at(index);
     files.remove(index);
-    dstPath = srcPath = file->getPath();
-    int srcLength = srcDirModel->getDir(file->getIndex()).length();
-    dstPath = dstPath.remove(0, srcLength);
-    QString additionalPath = srcDirModel->getPath(file->getIndex());
-    dstPath = additionalPath + dstPath;
+    srcPath = file->getPath();
+    dstPath = getDstPath(file->getPath(), file->getIndex());
+}
+
+void SourceFiles::getFirstFile(QString &srcPath, QString &dstPath) {
+    getFile(srcPath, dstPath, 0);
+}
+
+void SourceFiles::getRndFile(QString &srcPath, QString &dstPath) {
+    int rand = qrand()%files.size();
+    getFile(srcPath, dstPath, rand);
 }
 
 int SourceFiles::size() {
