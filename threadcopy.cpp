@@ -1,4 +1,9 @@
 #include <QtGui>
+
+#ifdef Q_OS_LINUX
+#include <QProcess>
+#endif
+
 #include <QHashIterator>
 #include "threadcopy.h"
 #include "diskinfo.h"
@@ -169,6 +174,15 @@ void ThreadCopy::copy() {
         QString newPath = dstFileInfo.path();
         dstFileInfo.dir().mkpath(newPath);
         QFile::copy(srcFile,dstFile);
+
+        #ifdef Q_OS_LINUX
+        QProcess *touch = new QProcess();
+        QString modifyTime =
+                srcFileInfo.lastModified().toString("yyMMddhhmm.ss");
+        touch->start("touch",
+                QStringList() << "-m" << "-t" << modifyTime << dstFile);
+        #endif
+
         if (enableFileCount && ++fileCount >= maxFileCount) {
             emit print(tr("The max file amount is reached."));
             break;

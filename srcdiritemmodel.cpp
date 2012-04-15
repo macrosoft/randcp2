@@ -90,9 +90,11 @@ QString SrcDirItemModel::serializePaths()  const {
 
 void SrcDirItemModel::updateDir(QString dir, QString path,
                                 const QModelIndex &index) {
-    dirs[index.row()] = dir;
-    additionalPath[index.row()] = path;
-    emit dataChanged(index,index);
+    if (dirs.size() > index.row()) {
+        dirs[index.row()] = dir;
+        additionalPath[index.row()] = path;
+        emit dataChanged(index,index);
+    }
 }
 //protected
 
