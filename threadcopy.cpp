@@ -176,11 +176,13 @@ void ThreadCopy::copy() {
         QFile::copy(srcFile,dstFile);
 
         #ifdef Q_OS_LINUX
-        QProcess *touch = new QProcess();
+        QProcess *touch = new QProcess(this);
         QString modifyTime =
                 srcFileInfo.lastModified().toString("yyMMddhhmm.ss");
         touch->start("touch",
                 QStringList() << "-m" << "-t" << modifyTime << dstFile);
+        touch->waitForFinished();
+        touch->deleteLater();
         #endif
 
         if (enableFileCount && ++fileCount >= maxFileCount) {

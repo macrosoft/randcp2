@@ -22,6 +22,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->srcListView->setAcceptDrops(true);
     ui->srcListView->setDropIndicatorShown(false);
     loadSettings();
+    for (int i = 0; i < ui->ignoreListWidget->count(); i++) {
+        ui->ignoreListWidget->item(i)->setFlags(
+                    ui->ignoreListWidget->item(i)->flags() |
+                    Qt::ItemIsEditable);
+    }
     threadCopy = NULL;
     state = READY;
 }
@@ -205,12 +210,14 @@ void MainWindow::stop() {
 //public slots
 
 void MainWindow::addDirIgnoreList() {
-
     QString ignoreDir = QFileDialog::getExistingDirectory(this,
                         tr("Select ignore directory"),
                         getLastSelectedIgnoreDir());
     if (!ignoreDir.isEmpty()) {
-        ui->ignoreListWidget->addItem(QDir::toNativeSeparators(ignoreDir));
+        QListWidgetItem *item = new QListWidgetItem(
+                    QDir::toNativeSeparators(ignoreDir));
+        item->setFlags(item->flags() | Qt::ItemIsEditable);
+        ui->ignoreListWidget->addItem(item);
         ui->delIgnoreButton->setEnabled(false);
         ui->editIgnoreButton->setEnabled(false);
     }
@@ -220,8 +227,12 @@ void MainWindow::addFileIgnoreList() {
     QString fileName = QFileDialog::getOpenFileName(this,
                             tr("Select ignore file"),
                             getLastSelectedIgnoreDir());
-    if (!fileName.isEmpty())
-        ui->ignoreListWidget->addItem(QDir::toNativeSeparators(fileName));
+    if (!fileName.isEmpty()) {
+        QListWidgetItem *item = new QListWidgetItem(
+                    QDir::toNativeSeparators(fileName));
+        item->setFlags(item->flags() | Qt::ItemIsEditable);
+        ui->ignoreListWidget->addItem(item);
+    }
 }
 
 void MainWindow::addFilterExt() {
@@ -306,8 +317,25 @@ void MainWindow::editSrcDirList() {
     if (selectSrcDir()) {
         srcDirModel->updateDir(newSrcDir, additionalPath,
                                selectedIndexSrcList);
+        ui->srcLineEdit->setText(newSrcDir);
         ui->editSrcButton->setEnabled(false);
         ui->delSrcButton->setEnabled(false);
+    }
+}
+
+void MainWindow::editSrcDirListLineEdit(QString path) {
+    if (selectedIndexSrcList.row() >= 0 && path.length() > 0) {
+        bool rootDisk = false;
+        #ifdef Q_OS_WIN
+        if (path.length() == 3 and path[1] == ':')
+            rootDisk = true;
+        #endif
+        if (!rootDisk &&
+            (path[path.length()-1] == '/' || path[path.length()-1] == '\\'))
+            path.remove(path.length() - 1 , 1);
+        path = QDir::toNativeSeparators(path);
+        srcDirModel->updateDir(path, additionalPath,
+                               selectedIndexSrcList);
     }
 }
 

@@ -62,6 +62,7 @@ public slots:
     void enableMaxDst(bool enable);
     void editIgnoreList();
     void editSrcDirList();
+    void editSrcDirListLineEdit(QString path);
     void log(QString msg);
     void pressStartButton();
     void refreshOutPath();

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>randcp 2.6.1</string>
+   <string>randcp 2.6.2</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
    <property name="spacing">
@@ -67,7 +67,7 @@
             <item>
              <widget class="QLineEdit" name="srcLineEdit">
               <property name="readOnly">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
              </widget>
             </item>
@@ -999,6 +999,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>srcLineEdit</sender>
+   <signal>textEdited(QString)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>editSrcDirListLineEdit(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>236</x>
+     <y>133</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>236</x>
+     <y>258</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>selectOutputDir()</slot>
@@ -1028,5 +1044,6 @@
   <slot>pressStartButton()</slot>
   <slot>editIgnoreList()</slot>
   <slot>refreshOutPath()</slot>
+  <slot>editSrcDirListLineEdit(QString)</slot>
  </slots>
 </ui>
