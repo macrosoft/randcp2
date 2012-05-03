@@ -79,14 +79,14 @@ bool ThreadCopy::checkFile(QFileInfo file, int index) {
     if (!filtred)
         return false;
     QRegExp rx("");
+    rx.setPatternSyntax(QRegExp::Wildcard);
     if (enableIgnore) {
         for (int i=0; i < ignoreListWidget->count(); i++) {
             rx.setPattern(QDir::fromNativeSeparators(
                               ignoreListWidget->item(i)->text()) + "*");
-                if (rx.exactMatch(file.absoluteFilePath())) {
-                    filtred = false;
-                    break;
-                }
+            if (rx.exactMatch(file.absoluteFilePath())) {
+                return false;
+            }
         }
     }
     QFileInfo dstFile(outputDir +
