@@ -43,7 +43,6 @@ private:
     void refreshParentDirLevel(int level);
     void startCopy();
     bool selectSrcDir();
-    QString sizeToStr(quint64 size);
     void stop();
 
 public slots:
@@ -76,6 +75,7 @@ public slots:
     void selectTab(int tabNum);
     void setEnabledFilter(bool enable);
     void setEnabledIgnore(bool enable);
+    void showQuestionMsg(QString question);
     void updateDiskFreeSpace();
 
 signals:

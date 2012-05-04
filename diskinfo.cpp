@@ -34,3 +34,16 @@ quint64 diskSize(QString path) {
 
     return free_space;
 }
+
+QString sizeToStr(quint64 size) {
+    if (size > 10737418240LL) { //10Gb
+        return QString::number(size/1024.0/1024.0/1024.0,0,2) + " Gb";
+    }
+    if (size > 1048576) { //1Mb
+        return QString::number(size/1024.0/1024.0,0,2) + " Mb";
+    }
+    if (size > 10240) { //10Kb
+        return QString::number(size/1024.0,0,2) + " kb";
+    }
+    return QString::number(size) + " b";
+}

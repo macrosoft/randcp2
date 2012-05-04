@@ -161,6 +161,8 @@ void MainWindow::startCopy() {
         connect(this, SIGNAL(stopThread()), threadCopy, SLOT(stop()));
         connect(ui->sleepSpinBox, SIGNAL(valueChanged(int)),
                 threadCopy, SLOT(setSleep(int)));
+        connect(threadCopy, SIGNAL(question(QString)),
+                SLOT(showQuestionMsg(QString)));
         for (int i=0; i < ui->tabWidget->count()-1; i++)
             ui->tabWidget->setTabEnabled(i, false);
         ui->logTextEdit->clear();
@@ -187,19 +189,6 @@ bool MainWindow::selectSrcDir() {
         return true;
     }
     return false;
-}
-
-QString MainWindow::sizeToStr(quint64 size) {
-    if (size > 10737418240LL) { //10Gb
-        return QString::number(size/1024.0/1024.0/1024.0,0,2) + " Gb";
-    }
-    if (size > 1048576) { //1Mb
-        return QString::number(size/1024.0/1024.0,0,2) + " Mb";
-    }
-    if (size > 10240) { //10Kb
-        return QString::number(size/1024.0,0,2) + " kb";
-    }
-    return QString::number(size) + " b";
 }
 
 void MainWindow::stop() {
@@ -441,6 +430,15 @@ void MainWindow::setEnabledFilter(bool enable) {
 
 void MainWindow::setEnabledIgnore(bool enable) {
     ui->ignoreGroupBox->setEnabled(enable);
+}
+
+void MainWindow::showQuestionMsg(QString question) {
+    QMessageBox *msg = new QMessageBox(QMessageBox::Information,
+                            "Limit is reached", question,
+                            QMessageBox::Yes | QMessageBox::No);
+    int answer = msg->exec();
+    threadCopy->setAnswer(answer);
+    threadCopy->questionWait.wakeAll();
 }
 
 void MainWindow::updateDiskFreeSpace() {

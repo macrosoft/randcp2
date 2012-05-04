@@ -1,6 +1,7 @@
 #include <QtGui>
 
 #ifdef Q_OS_LINUX
+#include <QMessageBox>
 #include <QProcess>
 #endif
 
@@ -35,6 +36,8 @@ ThreadCopy::ThreadCopy(QString nOutputDir, SrcDirItemModel *pSrcDirModel,
     maxDst = nMaxDst;
     stopFlag = false;
     setSleep(nSleep);
+    prepareLimitsTable();
+    answer = 0;
 }
 
 ThreadCopy::~ThreadCopy() {
@@ -72,6 +75,10 @@ void ThreadCopy::run() {
     deleteLater();
 }
 
+void ThreadCopy::setAnswer(int ans) {
+    answer = ans;
+}
+
 //private
 
 bool ThreadCopy::checkFile(QFileInfo file, int index) {
@@ -84,9 +91,9 @@ bool ThreadCopy::checkFile(QFileInfo file, int index) {
         for (int i=0; i < ignoreListWidget->count(); i++) {
             rx.setPattern(QDir::fromNativeSeparators(
                               ignoreListWidget->item(i)->text()) + "*");
-            if (rx.exactMatch(file.absoluteFilePath())) {
-                return false;
-            }
+        if (rx.exactMatch(file.absoluteFilePath())) {
+            return false;
+        }
         }
     }
     QFileInfo dstFile(outputDir +
@@ -116,10 +123,32 @@ bool ThreadCopy::checkFileFilter(QString file) {
     return filtred;
 }
 
+int ThreadCopy::checkLimits(QFileInfo srcFileInfo, int copiedFileSize) {
+    quint64 reserved_free_space = diskSize(outputDir) - srcFileInfo.size();
+    limits[DISK_SIZE_LIMIT].value =
+            diskSize(outputDir) < (quint64)srcFileInfo.size();
+    limits[RESERVED_SPACE_LIMIT].value =
+            reserved_free_space < minFreeSpace*1024*1024;
+    limits[COPIED_SIZE_LIMIT].value =
+            copiedFileSize + srcFileInfo.size() > limit*1024*1024;
+    limits[DEST_SIZE_LIMIT].value =
+            outDirSize + copiedFileSize + srcFileInfo.size() > maxDst*1024*1024;
+    for (int i = 0; i < LIMITS_COUNT; i++) {
+        if (limits[i].enable && limits[i].value) {
+            showQuestion(getTextQuestion(i, srcFileInfo));
+            if (answer == QMessageBox::Yes)
+                return TRY_OTHER_FILE;
+            emit print(limits[i].echo);
+            return LIMIT_REACHED;
+        }
+    }
+    return LIMIT_OK;
+}
+
 void ThreadCopy::copy() {
     int fileCount = 0;
     quint64 copiedFileSize = 0;
-    quint64 outDirSize = getDirSize(outputDir);
+    outDirSize = getDirSize(outputDir);
     while (!sourceFiles->isEmpty()) {
         if (getStopFlag()) {
             emit print(tr("***Stoped!***"));
@@ -138,39 +167,16 @@ void ThreadCopy::copy() {
             dest.remove();
         }
         QFileInfo srcFileInfo(srcFile);
-        if (diskSize(outputDir) < (quint64)srcFileInfo.size()) {
-            emit print(tr("No free disk space!"));
+        int check = checkLimits(srcFileInfo, copiedFileSize);
+        if (check == LIMIT_REACHED)
             break;
-        }
-        if (enableMinFreeSpace) {
-            quint64 reserved_free_space = diskSize(outputDir)
-                    - srcFileInfo.size();
-             if (reserved_free_space
-                     < minFreeSpace*1024*1024) {
-                emit print(tr("The min free space amount is reached."));
-                break;
-            }
-        }
-        if (enableLimit) {
-            if (copiedFileSize + srcFileInfo.size() >
-                    limit*1024*1024) {
-                emit print(tr("The max copied file size amount is reached."));
-                break;
-            }
-        }
-        if (enableMaxDst) {
-            if (outDirSize + copiedFileSize + srcFileInfo.size() >
-                    maxDst*1024*1024) {
-                emit print(tr(
-                           "The max output directory size amount is reached."));
-                break;
-            }
-        }
+        emit fileQueueChanged(sourceFiles->size());
+        if (check == TRY_OTHER_FILE)
+            continue;
         copiedFileSize += srcFileInfo.size();
         emit print(tr("Copy %1").arg(QDir::toNativeSeparators(srcFile)));
         emit print(tr("to %2").arg(QDir::toNativeSeparators(dstFile)));
         emit print(QString());
-        emit fileQueueChanged(sourceFiles->size());
         QString newPath = dstFileInfo.path();
         dstFileInfo.dir().mkpath(newPath);
         QFile::copy(srcFile,dstFile);
@@ -234,6 +240,43 @@ bool ThreadCopy::getStopFlag() {
     return stopFlag;
 }
 
+QString ThreadCopy::getTextQuestion(int limit, QFileInfo srcFileInfo) {
+    switch (limit) {
+    case DISK_SIZE_LIMIT:
+        return tr("Can`t copy file %1 (%2). %3 free. Try other file?")
+                .arg(QDir::toNativeSeparators(srcFileInfo.absoluteFilePath()))
+                .arg(sizeToStr(srcFileInfo.size()))
+                .arg(sizeToStr(diskSize(outputDir)));
+    case RESERVED_SPACE_LIMIT:
+        return tr("Can`t copy file %1 (%2). Try other file?")
+                .arg(QDir::toNativeSeparators(srcFileInfo.absoluteFilePath()))
+                .arg(sizeToStr(srcFileInfo.size()));
+    case COPIED_SIZE_LIMIT:
+        return tr("Can`t copy file %1 (%2). Try other file?")
+                .arg(QDir::toNativeSeparators(srcFileInfo.absoluteFilePath()))
+                .arg(sizeToStr(srcFileInfo.size()));
+    case DEST_SIZE_LIMIT:
+        return tr("Can`t copy file %1 (%2). Try other file?")
+                .arg(QDir::toNativeSeparators(srcFileInfo.absoluteFilePath()))
+                .arg(sizeToStr(srcFileInfo.size()));
+    }
+    return QString();
+}
+
+void ThreadCopy::prepareLimitsTable() {
+    limits[DISK_SIZE_LIMIT].enable = true;
+    limits[DISK_SIZE_LIMIT].echo = tr("No free disk space!");
+    limits[RESERVED_SPACE_LIMIT].enable = enableMinFreeSpace;
+    limits[RESERVED_SPACE_LIMIT].echo =
+            tr("The min free space amount is reached.");
+    limits[COPIED_SIZE_LIMIT].enable = enableLimit;
+    limits[COPIED_SIZE_LIMIT].echo =
+            tr("The max copied file size amount is reached.");
+    limits[DEST_SIZE_LIMIT].enable = enableMaxDst;
+    limits[DEST_SIZE_LIMIT].echo =
+            tr("The max output directory size amount is reached.");
+}
+
 void ThreadCopy::scan() {
     int srcCount = srcDirModel->rowCount();
     int filesFound = 0;
@@ -286,6 +329,13 @@ void ThreadCopy::scanOutput(QString pathDir) {
              QFileInfo d = dirs.at(i);
              scanOutput(d.absoluteFilePath());
     }
+}
+
+void ThreadCopy::showQuestion(QString q) {
+    emit question(q);
+    questionMutex.lock();
+    questionWait.wait(&questionMutex);
+    questionMutex.unlock();
 }
 
 //slots
