@@ -9,17 +9,19 @@
 #include "threadcopy.h"
 #include "diskinfo.h"
 
-ThreadCopy::ThreadCopy(QString nOutputDir, SrcDirItemModel *pSrcDirModel,
-                       int nMode, bool enableFilterFlag,
-                       QListWidget *pFilterListWidget, bool enableIgnoreFlag,
-                       QListWidget *pIgnoreListWidget, bool enableFileCountFlag,
-                       int nMaxFileCount, bool enableMinFreeSpaceFlag,
-                       float nMinFreeSpace, bool enableLimitFlag,
-                       float nLimit, bool enableMaxDstFlag,
-                       float nMaxDst, int nSleep, QObject *parent) :
+ThreadCopy::ThreadCopy(Settings *pSettings,
+                       SrcDirItemModel *pSrcDirModel, int nMode,
+                       bool enableFilterFlag, QListWidget *pFilterListWidget,
+                       bool enableIgnoreFlag, QListWidget *pIgnoreListWidget,
+                       bool enableFileCountFlag, int nMaxFileCount,
+                       bool enableMinFreeSpaceFlag, float nMinFreeSpace,
+                       bool enableLimitFlag, float nLimit,
+                       bool enableMaxDstFlag, float nMaxDst, int nSleep,
+                       QObject *parent) :
     QThread(parent)
 {
-    outputDir = nOutputDir;
+    settings = pSettings;
+    outputDir = settings->getOutputDir();
     srcDirModel = pSrcDirModel;
     mode = nMode;
     enableFilter = enableFilterFlag;

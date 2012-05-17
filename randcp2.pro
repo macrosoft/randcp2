@@ -18,7 +18,8 @@ SOURCES += main.cpp\
     threadcopy.cpp \
     additionalpath.cpp \
     droplistwidget.cpp \
-    droplineedit.cpp
+    droplineedit.cpp \
+    settings.cpp
 
 HEADERS  += mainwindowdf.h \
     sourcefiles.h \
@@ -28,7 +29,8 @@ HEADERS  += mainwindowdf.h \
     threadcopy.h \
     additionalpath.h \
     droplistwidget.h \
-    droplineedit.h
+    droplineedit.h \
+    settings.h
 
 FORMS += \
     mainwindow.ui

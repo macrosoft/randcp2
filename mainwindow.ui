@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>randcp 2.6.3</string>
+   <string>randcp 2.6.3.a</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
    <property name="spacing">
@@ -987,7 +987,7 @@
    <sender>outDirLineEdit</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>refreshOutPath()</slot>
+   <slot>outDirChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>67</x>
@@ -1043,7 +1043,7 @@
   <slot>startCopy()</slot>
   <slot>pressStartButton()</slot>
   <slot>editIgnoreList()</slot>
-  <slot>refreshOutPath()</slot>
+  <slot>outDirChanged()</slot>
   <slot>editSrcDirListLineEdit(QString)</slot>
  </slots>
 </ui>

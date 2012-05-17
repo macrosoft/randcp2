@@ -5,8 +5,9 @@
 #include <QtGui>
 #include <QFileInfo>
 #include <QHash>
-#include "srcdiritemmodel.h"
+#include "settings.h"
 #include "sourcefiles.h"
+#include "srcdiritemmodel.h"
 
 class ThreadCopy : public QThread
 {
@@ -18,14 +19,14 @@ public:
     QWaitCondition questionWait;
 
 
-    ThreadCopy(QString nOutputDir, SrcDirItemModel *pSrcDirModel, int nMode,
-               bool enableFilterFlag, QListWidget *pFilterListWidget,
-               bool enableIgnoreFlag, QListWidget *pIgnoreListWidget,
-               bool enableFileCountFlag, int nMaxFileCount,
-               bool enableMinFreeSpaceFlag, float nMinFreeSpace,
-               bool enableLimitFlag, float nLimit,
-               bool enableMaxDstFlag, float nMaxDst, int nSleep,
-               QObject *parent = 0);
+    ThreadCopy(Settings *pSettings, SrcDirItemModel *pSrcDirModel, int nMode,
+               bool enableFilterFlag,
+               QListWidget *pFilterListWidget, bool enableIgnoreFlag,
+               QListWidget *pIgnoreListWidget, bool enableFileCountFlag,
+               int nMaxFileCount, bool enableMinFreeSpaceFlag,
+               float nMinFreeSpace, bool enableLimitFlag,
+               float nLimit, bool enableMaxDstFlag,
+               float nMaxDst, int nSleep, QObject *parent);
     ~ThreadCopy();
     void run();
     void setAnswer(int ans);
@@ -60,6 +61,7 @@ private:
     QString outputDir;
     quint64 outDirSize;
     QHash<QString, bool> outputFiles;
+    Settings *settings;
     SourceFiles *sourceFiles;
     int sleepTime;
     SrcDirItemModel *srcDirModel;

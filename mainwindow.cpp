@@ -5,7 +5,6 @@
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QRegExp>
-#include <QSettings>
 
 #include "additionalpath.h"
 #include "diskinfo.h"
@@ -33,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow() {
     delete ui;
-    settings->deleteLater();
+    settings->~Settings();
 }
 
 //private
@@ -52,15 +51,6 @@ QString MainWindow::getLastSelectedIgnoreDir() {
         return ui->ignoreListWidget->item(
                     ui->ignoreListWidget->count()-1)->text();
     return QString();
-}
-
-QString MainWindow::getOutputDir() {
-    QString outDir = ui->outDirLineEdit->text();
-#ifdef Q_OS_WIN
-    if (outDir.length() == 3 and outDir[1] == ':')
-        outDir.remove(2,1);
-#endif
-    return outDir;
 }
 
 QString MainWindow::listWidgetToSting(QListWidget *lw) {
@@ -84,49 +74,51 @@ void MainWindow::loadListWidgetFromString(QListWidget *lw, QString str) {
 }
 
 void MainWindow::loadSettings() {
-    settings = new QSettings("randcp2.ini",QSettings::IniFormat);
-    ui->outDirLineEdit->setText(settings->value("outdir").toString());
-    srcDirModel->load(settings->value("srcdir").toString(),
-                      settings->value("srcpath").toString());
-    ui->filterCheckBox->setChecked(settings->value("enextfilter").toBool());
-    ui->filterGroupBox->setEnabled(settings->value("enextfilter").toBool());
+    settings = new Settings();
+    ui->outDirLineEdit->setText(settings->getString(Settings::OUTDIR));
+    srcDirModel->load(settings->getString(Settings::SRCDIR),
+                      settings->getString(Settings::SRCPATH));
+    ui->filterCheckBox->setChecked(settings->getBool(Settings::EN_EXTFILTER));
+    ui->filterGroupBox->setEnabled(settings->getBool(Settings::EN_EXTFILTER));
     loadListWidgetFromString(ui->filterListWidget,
-                             settings->value("extfilter").toString());
-    ui->ignoreCheckBox->setChecked(settings->value("enignorefilter").toBool());
-    ui->ignoreGroupBox->setEnabled(settings->value("enignorefilter").toBool());
+                             settings->getString(Settings::EXTFILTER));
+    ui->ignoreCheckBox->setChecked(
+                settings->getBool(Settings::EN_IGNOREFILTER));
+    ui->ignoreGroupBox->setEnabled(
+                settings->getBool(Settings::EN_IGNOREFILTER));
     loadListWidgetFromString(ui->ignoreListWidget,
-                             settings->value("ignorefilter").toString());
-    if (settings->value("mode", true).toBool())
+                             settings->getString(Settings::IGNOREFILTER));
+    if (settings->getBool(Settings::MODE, true))
         ui->rndModeRadioButton->setChecked(true);
     else
         ui->synchModeRadioButto->setChecked(true);
     ui->fileCountCheckBox->setChecked(
-                settings->value("enablemaxfilecount").toBool());
+                settings->getBool(Settings::EN_MAXFILECOUNT));
     ui->fileCountSpinBox->setEnabled(
-                settings->value("enablemaxfilecount").toBool());
-    ui->fileCountSpinBox->setValue(settings->value("ablemaxfilecount").toInt());
+                settings->getBool(Settings::EN_MAXFILECOUNT));
+    ui->fileCountSpinBox->setValue(settings->getInt(Settings::MAXFILECOUNT));
     ui->minFreeSpaceCheckBox->setChecked(
-                settings->value("enminfreespace").toBool());
+                settings->getBool(Settings::EN_MINFREESPACE));
     ui->freeSpaceSpinBox->setEnabled(
-                settings->value("enminfreespace").toBool());
-    ui->freeSpaceSpinBox->setValue(settings->value("minfreespace").toDouble());
-    ui->limitCheckBox->setChecked(settings->value("enlimit").toBool());
-    ui->limitSpinBox->setEnabled(settings->value("enlimit").toBool());
-    ui->limitSpinBox->setValue(settings->value("limit").toDouble());
-    ui->maxDstCheckBox->setChecked(settings->value("enmaxdst").toBool());
-    ui->maxDstSpinBox->setEnabled(settings->value("enmaxdst").toBool());
-    ui->maxDstSpinBox->setValue(settings->value("maxdst").toDouble());
+                settings->getBool(Settings::EN_MINFREESPACE));
+    ui->freeSpaceSpinBox->setValue(settings->getDouble(Settings::MINFREESPACE));
+    ui->limitCheckBox->setChecked(settings->getBool(Settings::EN_LIMIT));
+    ui->limitSpinBox->setEnabled(settings->getBool(Settings::EN_LIMIT));
+    ui->limitSpinBox->setValue(settings->getDouble(Settings::LIMIT));
+    ui->maxDstCheckBox->setChecked(settings->getBool(Settings::EN_MAXDST));
+    ui->maxDstSpinBox->setEnabled(settings->getBool(Settings::EN_MAXDST));
+    ui->maxDstSpinBox->setValue(settings->getDouble(Settings::MAXDST));
 }
 
 void MainWindow::printFullOutPath(QString addPath) {
-    ui->srcStatusLabel->setText(getOutputDir()+
+    ui->srcStatusLabel->setText(settings->getOutputDir() +
                                 QDir::toNativeSeparators(addPath) +
                                 QDir::separator() + "...");
 }
 
 void MainWindow::refreshParentDirLevel(int level) {
     additionalPath = getAdditonalPath(newSrcDir, level);
-    QString outDir = QDir::toNativeSeparators(getOutputDir());
+    QString outDir = QDir::toNativeSeparators(settings->getOutputDir());
     printFullOutPath(additionalPath);
 }
 
@@ -134,7 +126,7 @@ void MainWindow::startCopy() {
     if (!ui->outDirLineEdit->text().isEmpty()) {
         int mode = ui->rndModeRadioButton->isChecked()? ThreadCopy::SHUFFLE:
                                                         ThreadCopy::SYNCHRONIZE;
-        threadCopy = new ThreadCopy(getOutputDir(),
+        threadCopy = new ThreadCopy(settings,
                                     srcDirModel,
                                     mode,
                                     ui->filterCheckBox->checkState(),
@@ -343,31 +335,34 @@ void MainWindow::pressStartButton() {
     }
 }
 
-void MainWindow::refreshOutPath() {
+void MainWindow::outDirChanged() {
     refreshParentDirLevel(ui->parentDirSpinBox->value());
+    settings->setString(Settings::OUTDIR, ui->outDirLineEdit->text());
 }
 
 void MainWindow::saveSettings() {
-    settings->setValue("outdir",ui->outDirLineEdit->text());
-    settings->setValue("srcdir",srcDirModel->serializeDirs());
-    settings->setValue("srcpath",srcDirModel->serializePaths());
-    settings->setValue("enextfilter", ui->filterCheckBox->checkState());
-    settings->setValue("extfilter",listWidgetToSting(ui->filterListWidget));
-    settings->setValue("enignorefilter", ui->ignoreCheckBox->checkState());
-    settings->setValue("ignorefilter",listWidgetToSting(ui->ignoreListWidget));
-    settings->setValue("mode",ui->rndModeRadioButton->isChecked());
-    settings->setValue("enablemaxfilecount",
-                       ui->fileCountCheckBox->checkState());
-    settings->setValue("maxfilecount",ui->fileCountSpinBox->value());
-    settings->setValue("enminfreespace",
-                       ui->minFreeSpaceCheckBox->checkState());
-    settings->setValue("minfreespace",ui->freeSpaceSpinBox->value());
-    settings->setValue("enlimit",
-                       ui->limitCheckBox->checkState());
-    settings->setValue("limit",ui->limitSpinBox->value());
-    settings->setValue("enmaxdst",
+    settings->setString(Settings::SRCDIR, srcDirModel->serializeDirs());
+    settings->setString(Settings::SRCPATH, srcDirModel->serializePaths());
+    settings->setBool(Settings::EN_EXTFILTER, ui->filterCheckBox->checkState());
+    settings->setString(Settings::EXTFILTER,
+                        listWidgetToSting(ui->filterListWidget));
+    settings->setBool(Settings::EN_IGNOREFILTER,
+                      ui->ignoreCheckBox->checkState());
+    settings->setString(Settings::IGNOREFILTER,
+                        listWidgetToSting(ui->ignoreListWidget));
+    settings->setBool(Settings::MODE, ui->rndModeRadioButton->isChecked());
+    settings->setBool(Settings::EN_MAXFILECOUNT,
+                      ui->fileCountCheckBox->checkState());
+    settings->setInt(Settings::MAXFILECOUNT, ui->fileCountSpinBox->value());
+    settings->setBool(Settings::EN_MINFREESPACE,
+                      ui->minFreeSpaceCheckBox->checkState());
+    settings->setDouble(Settings::MINFREESPACE, ui->freeSpaceSpinBox->value());
+    settings->setBool(Settings::EN_LIMIT,
+                      ui->limitCheckBox->checkState());
+    settings->setDouble(Settings::LIMIT, ui->limitSpinBox->value());
+    settings->setBool(Settings::EN_MAXDST,
                        ui->maxDstCheckBox->checkState());
-    settings->setValue("maxdst",ui->maxDstSpinBox->value());
+    settings->setDouble(Settings::MAXDST, ui->maxDstSpinBox->value());
     settings->sync();
 }
 

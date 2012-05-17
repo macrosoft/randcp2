@@ -3,9 +3,9 @@
 
 #include <QFileInfo>
 #include <QtGui/QListWidget>
-#include <QSettings>
 #include <QWidget>
 
+#include "settings.h"
 #include "srcdiritemmodel.h"
 #include "threadcopy.h"
 
@@ -27,7 +27,7 @@ private:
     QString additionalPath;
     QString newSrcDir;
     QModelIndex selectedIndexSrcList;
-    QSettings *settings;
+    Settings *settings;
     SrcDirItemModel *srcDirModel;
     int state;
     ThreadCopy *threadCopy;
@@ -35,7 +35,6 @@ private:
 
     void cancelScan();
     QString getLastSelectedIgnoreDir();
-    QString getOutputDir();
     QString listWidgetToSting(QListWidget *lw);
     void loadListWidgetFromString(QListWidget *lw, QString str);
     void loadSettings();
@@ -64,7 +63,7 @@ public slots:
     void editSrcDirListLineEdit(QString path);
     void log(QString msg);
     void pressStartButton();
-    void refreshOutPath();
+    void outDirChanged();
     void saveSettings();
     void scanFinished();
     void selectFilterExtList();
