@@ -25,12 +25,8 @@ Settings::~Settings() {
 }
 
 bool Settings::getBool(int index) {
-    return getBool(index, false);
-}
-
-bool Settings::getBool(int index, bool defaultValue) {
     QString key = keys[index];
-    return qSettings->value(key, defaultValue).toBool();
+    return qSettings->value(key).toBool();
 }
 
 double Settings::getDouble(int index) {
@@ -39,8 +35,12 @@ double Settings::getDouble(int index) {
 }
 
 int Settings::getInt(int index) {
+    return getInt(index, 0);
+}
+
+int Settings::getInt(int index, int defaultValue) {
     QString key = keys[index];
-    return qSettings->value(key).toInt();
+    return qSettings->value(key, defaultValue).toInt();
 }
 
 QString Settings::getOutputDir() {
@@ -79,4 +79,11 @@ void Settings::setString(int index, QString value) {
 
 void Settings::sync() {
     qSettings->sync();
+}
+
+void Settings::setMode(bool mode) {
+    if (mode)
+        setInt(MODE, SHUFFLE);
+    else
+        setInt(MODE, SYNCHRONIZE);
 }

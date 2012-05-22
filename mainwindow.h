@@ -49,6 +49,7 @@ public slots:
     void addFileIgnoreList();
     void addFilterExt();
     void addSrcDir();
+    void changeSettings();
     void delFilterExtList();
     void delIgnoreList();
     void delSrcDirList();

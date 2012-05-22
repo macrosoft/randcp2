@@ -9,33 +9,22 @@
 #include "threadcopy.h"
 #include "diskinfo.h"
 
-ThreadCopy::ThreadCopy(Settings *pSettings,
-                       SrcDirItemModel *pSrcDirModel, int nMode,
-                       bool enableFilterFlag, QListWidget *pFilterListWidget,
-                       bool enableIgnoreFlag, QListWidget *pIgnoreListWidget,
-                       bool enableFileCountFlag, int nMaxFileCount,
-                       bool enableMinFreeSpaceFlag, float nMinFreeSpace,
-                       bool enableLimitFlag, float nLimit,
-                       bool enableMaxDstFlag, float nMaxDst, int nSleep,
+ThreadCopy::ThreadCopy(Settings *pSettings, SrcDirItemModel *pSrcDirModel,
+                       QListWidget *pFilterListWidget,
+                       QListWidget *pIgnoreListWidget, int nSleep,
                        QObject *parent) :
-    QThread(parent)
-{
+    QThread(parent) {
     settings = pSettings;
     outputDir = settings->getOutputDir();
     srcDirModel = pSrcDirModel;
-    mode = nMode;
-    enableFilter = enableFilterFlag;
+    enableFilter = settings->getBool(Settings::EN_EXTFILTER);
     filterListWidget = pFilterListWidget;
-    enableIgnore = enableIgnoreFlag;
+    enableIgnore = settings->getBool(Settings::EN_IGNOREFILTER);
     ignoreListWidget = pIgnoreListWidget;
-    enableFileCount = enableFileCountFlag;
-    maxFileCount = nMaxFileCount;
-    enableMinFreeSpace = enableMinFreeSpaceFlag;
-    minFreeSpace = nMinFreeSpace;
-    enableLimit = enableLimitFlag;
-    limit = nLimit;
-    enableMaxDst = enableMaxDstFlag;
-    maxDst = nMaxDst;
+    enableFileCount = settings->getBool(Settings::EN_MAXFILECOUNT);
+    minFreeSpace = settings->getDouble(Settings::MINFREESPACE)*1024*1024;
+    limit = settings->getDouble(Settings::LIMIT)*1024*1024;
+    maxDst = settings->getDouble(Settings::MAXDST);
     stopFlag = false;
     setSleep(nSleep);
     prepareLimitsTable();
@@ -62,12 +51,12 @@ void ThreadCopy::run() {
             return;
         }
     }
-    switch (mode) {
-    case SHUFFLE:
+    switch (settings->getInt(Settings::MODE)) {
+    case Settings::SHUFFLE:
         scan();
         copy();
         break;
-    case SYNCHRONIZE:
+    case Settings::SYNCHRONIZE:
         scanOutput(outputDir);
         scan();
         deleteOldFiles();
@@ -129,12 +118,11 @@ int ThreadCopy::checkLimits(QFileInfo srcFileInfo, int copiedFileSize) {
     quint64 reserved_free_space = diskSize(outputDir) - srcFileInfo.size();
     limits[DISK_SIZE_LIMIT].value =
             diskSize(outputDir) < (quint64)srcFileInfo.size();
-    limits[RESERVED_SPACE_LIMIT].value =
-            reserved_free_space < minFreeSpace*1024*1024;
+    limits[RESERVED_SPACE_LIMIT].value = reserved_free_space < minFreeSpace;
     limits[COPIED_SIZE_LIMIT].value =
-            copiedFileSize + srcFileInfo.size() > limit*1024*1024;
+            copiedFileSize + srcFileInfo.size() > limit;
     limits[DEST_SIZE_LIMIT].value =
-            outDirSize + copiedFileSize + srcFileInfo.size() > maxDst*1024*1024;
+            outDirSize + copiedFileSize + srcFileInfo.size() > maxDst;
     for (int i = 0; i < LIMITS_COUNT; i++) {
         if (limits[i].enable && limits[i].value) {
             showQuestion(getTextQuestion(i, srcFileInfo));
@@ -149,6 +137,7 @@ int ThreadCopy::checkLimits(QFileInfo srcFileInfo, int copiedFileSize) {
 
 void ThreadCopy::copy() {
     int fileCount = 0;
+    int maxFileCount = settings->getInt(Settings::MAXFILECOUNT);
     quint64 copiedFileSize = 0;
     outDirSize = getDirSize(outputDir);
     while (!sourceFiles->isEmpty()) {
@@ -157,7 +146,7 @@ void ThreadCopy::copy() {
             break;
         }
         QString srcFile, dstFile;
-        if (mode == SHUFFLE)
+        if (settings->getInt(Settings::MODE) == Settings::SHUFFLE)
             sourceFiles->getRndFile(srcFile, dstFile);
         else
             sourceFiles->getFirstFile(srcFile, dstFile);
@@ -268,13 +257,14 @@ QString ThreadCopy::getTextQuestion(int limit, QFileInfo srcFileInfo) {
 void ThreadCopy::prepareLimitsTable() {
     limits[DISK_SIZE_LIMIT].enable = true;
     limits[DISK_SIZE_LIMIT].echo = tr("No free disk space!");
-    limits[RESERVED_SPACE_LIMIT].enable = enableMinFreeSpace;
+    limits[RESERVED_SPACE_LIMIT].enable =
+            settings->getBool(Settings::EN_MINFREESPACE);
     limits[RESERVED_SPACE_LIMIT].echo =
             tr("The min free space amount is reached.");
-    limits[COPIED_SIZE_LIMIT].enable = enableLimit;
+    limits[COPIED_SIZE_LIMIT].enable = settings->getBool(Settings::EN_LIMIT);
     limits[COPIED_SIZE_LIMIT].echo =
             tr("The max copied file size amount is reached.");
-    limits[DEST_SIZE_LIMIT].enable = enableMaxDst;
+    limits[DEST_SIZE_LIMIT].enable = settings->getBool(Settings::EN_MAXDST);
     limits[DEST_SIZE_LIMIT].echo =
             tr("The max output directory size amount is reached.");
 }

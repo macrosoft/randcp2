@@ -14,19 +14,12 @@ class ThreadCopy : public QThread
     Q_OBJECT
 
 public:
-    enum {SHUFFLE, SYNCHRONIZE};
-
     QWaitCondition questionWait;
 
 
-    ThreadCopy(Settings *pSettings, SrcDirItemModel *pSrcDirModel, int nMode,
-               bool enableFilterFlag,
-               QListWidget *pFilterListWidget, bool enableIgnoreFlag,
-               QListWidget *pIgnoreListWidget, bool enableFileCountFlag,
-               int nMaxFileCount, bool enableMinFreeSpaceFlag,
-               float nMinFreeSpace, bool enableLimitFlag,
-               float nLimit, bool enableMaxDstFlag,
-               float nMaxDst, int nSleep, QObject *parent);
+    ThreadCopy(Settings *pSettings, SrcDirItemModel *pSrcDirModel,
+               QListWidget *pFilterListWidget, QListWidget *pIgnoreListWidget,
+               int nSleep, QObject *parent);
     ~ThreadCopy();
     void run();
     void setAnswer(int ans);
@@ -46,17 +39,12 @@ private:
     bool enableFileCount;
     bool enableFilter;
     bool enableIgnore;
-    bool enableLimit;
-    bool enableMaxDst;
-    bool enableMinFreeSpace;
     QListWidget *filterListWidget;
     QListWidget *ignoreListWidget;
     float limit;
     Limits limits[LIMITS_COUNT];
     float maxDst;
-    int maxFileCount;
     float minFreeSpace;
-    int mode;
     QMutex mutex;
     QString outputDir;
     quint64 outDirSize;

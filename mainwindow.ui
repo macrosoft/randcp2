@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>randcp 2.6.3.a</string>
+   <string>randcp 2.6.3.b</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
    <property name="spacing">
@@ -352,7 +352,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="synchModeRadioButto">
+           <widget class="QRadioButton" name="synchModeRadioButton">
             <property name="text">
              <string>Synchronization</string>
             </property>
@@ -1015,6 +1015,166 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>filterCheckBox</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>changeSettings()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>236</x>
+     <y>43</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>236</x>
+     <y>258</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ignoreCheckBox</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>changeSettings()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>236</x>
+     <y>272</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>236</x>
+     <y>258</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fileCountCheckBox</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>changeSettings()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>65</x>
+     <y>55</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>236</x>
+     <y>258</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fileCountSpinBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>changeSettings()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>65</x>
+     <y>55</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>236</x>
+     <y>258</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>minFreeSpaceCheckBox</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>changeSettings()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>65</x>
+     <y>55</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>236</x>
+     <y>258</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>freeSpaceSpinBox</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>changeSettings()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>65</x>
+     <y>55</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>236</x>
+     <y>258</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>limitCheckBox</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>changeSettings()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>65</x>
+     <y>55</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>236</x>
+     <y>258</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>limitSpinBox</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>changeSettings()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>65</x>
+     <y>55</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>236</x>
+     <y>258</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>maxDstCheckBox</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>changeSettings()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>65</x>
+     <y>55</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>236</x>
+     <y>258</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>maxDstSpinBox</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>changeSettings()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>65</x>
+     <y>55</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>236</x>
+     <y>258</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>selectOutputDir()</slot>
@@ -1045,5 +1205,6 @@
   <slot>editIgnoreList()</slot>
   <slot>outDirChanged()</slot>
   <slot>editSrcDirListLineEdit(QString)</slot>
+  <slot>changeSettings()</slot>
  </slots>
 </ui>

@@ -3,20 +3,22 @@
 
 #include <QSettings>
 
-class Settings
+class Settings: public QObject
 {
+    Q_OBJECT
 public:
     enum {OUTDIR, SRCDIR, SRCPATH, EN_EXTFILTER, EXTFILTER, EN_IGNOREFILTER,
           IGNOREFILTER, MODE, EN_MAXFILECOUNT, MAXFILECOUNT, EN_MINFREESPACE,
           MINFREESPACE, EN_LIMIT, LIMIT, EN_MAXDST, MAXDST, KEYS_COUNT};
+    enum {SHUFFLE, SYNCHRONIZE};
 
     Settings();
     ~Settings();
 
     bool getBool(int index);
-    bool getBool(int index, bool defaultValue);
     double getDouble(int index);
     int getInt(int index);
+    int getInt(int index, int defaultValue);
     QString getString(int index);
     void setBool(int index, bool value);
     void setDouble(int index, double value);
@@ -24,6 +26,8 @@ public:
     QString getOutputDir();
     void setString(int index, QString value);
     void sync();
+public slots:
+    void setMode(bool mode);
 private:
     QString keys[KEYS_COUNT];
     QSettings *qSettings;
