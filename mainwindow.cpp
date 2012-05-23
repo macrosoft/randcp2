@@ -439,7 +439,7 @@ void MainWindow::showQuestionMsg(QString question) {
 
 void MainWindow::updateDiskFreeSpace() {
     QString freeSpace = sizeToStr(diskSize(ui->outDirLineEdit->text()));
-    ui->freeSpaceLabel->setText(tr("Free disk space: ") + freeSpace);
+    ui->freeSpaceLabel->setText(tr("Free disk space: %1").arg(freeSpace));
 }
 
 //signals

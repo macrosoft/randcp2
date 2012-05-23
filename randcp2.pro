@@ -36,3 +36,5 @@ FORMS += \
     mainwindow.ui
 
 INCLUDEPATH += /usr/include/x86_64-linux-gnu
+
+TRANSLATIONS = randcp2_ru.ts

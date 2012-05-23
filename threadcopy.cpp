@@ -274,7 +274,7 @@ void ThreadCopy::scan() {
     int filesFound = 0;
     for (int i=0; i<srcCount; i++) {
         emit print(QString(tr("Scanning directories: %1 of %2")).arg(i+1)
-                   .arg(srcCount).toAscii());
+                   .arg(srcCount));
         emit print(QString(tr("Scanning: %1")).arg(srcDirModel->dirAt(i)));
         filesFound = scanDir(srcDirModel->dirAt(i), i);
         emit print(QString(tr("Files found: %1")).arg(filesFound));

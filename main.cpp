@@ -4,6 +4,13 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    QTranslator translator;
+    QString translateFile = "randcp2_" + QLocale::system().name() + ".qm";
+    if (!translator.load(translateFile))
+        return 5;
+    a.installTranslator(&translator);
+
     MainWindow w;
     w.show();
 
