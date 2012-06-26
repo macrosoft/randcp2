@@ -7,8 +7,7 @@ int main(int argc, char *argv[])
 
     QTranslator translator;
     QString translateFile = "randcp2_" + QLocale::system().name() + ".qm";
-    if (!translator.load(translateFile))
-        return 5;
+    translator.load(translateFile);
     a.installTranslator(&translator);
 
     MainWindow w;

@@ -430,7 +430,7 @@ void MainWindow::setEnabledIgnore(bool enable) {
 
 void MainWindow::showQuestionMsg(QString question) {
     QMessageBox *msg = new QMessageBox(QMessageBox::Information,
-                            "Limit is reached", question,
+                            tr("Limit is reached"), question,
                             QMessageBox::Yes | QMessageBox::No);
     int answer = msg->exec();
     threadCopy->setAnswer(answer);

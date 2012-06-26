@@ -5,7 +5,8 @@
     <name>MainWindow</name>
     <message>
         <location filename="mainwindow.ui" line="14"/>
-        <source>randcp 2.6.3.b</source>
+        <source>randcp 2.6.3.c</source>
+        <oldsource>randcp 2.6.3.b</oldsource>
         <translation></translation>
     </message>
     <message>
@@ -42,7 +43,7 @@
         <location filename="mainwindow.ui" line="144"/>
         <location filename="mainwindow.ui" line="297"/>
         <source>Edit...</source>
-        <translation>Редактировать...</translation>
+        <translation>Править...</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="154"/>
@@ -223,6 +224,11 @@
         <location filename="mainwindow.cpp" line="387"/>
         <source>Select output directory</source>
         <translation>Выберите выходную директорию</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="433"/>
+        <source>Limit is reached</source>
+        <translation>Лимит достигнут</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="442"/>
