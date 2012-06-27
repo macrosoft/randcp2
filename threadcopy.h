@@ -54,9 +54,11 @@ private:
     int sleepTime;
     SrcDirItemModel *srcDirModel;
     bool stopFlag;
+    QRegExp wildcard;
     QMutex questionMutex;
     bool checkFile(QFileInfo file, int index);
     bool checkFileFilter(QString file);
+    bool checkFileIgnore(QString file);
     int checkLimits(QFileInfo srcFileInfo, int copiedFileSize);
     void copy();
     void deleteOldFiles();

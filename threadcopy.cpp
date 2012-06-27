@@ -29,6 +29,10 @@ ThreadCopy::ThreadCopy(Settings *pSettings, SrcDirItemModel *pSrcDirModel,
     setSleep(nSleep);
     prepareLimitsTable();
     answer = 0;
+    #ifdef Q_OS_WIN
+    wildcard.setCaseSensitivity(Qt::CaseInsensitive);
+    #endif
+    wildcard.setPatternSyntax(QRegExp::Wildcard);
 }
 
 ThreadCopy::~ThreadCopy() {
@@ -73,45 +77,42 @@ void ThreadCopy::setAnswer(int ans) {
 //private
 
 bool ThreadCopy::checkFile(QFileInfo file, int index) {
-    bool filtred = checkFileFilter(file.absoluteFilePath());
-    if (!filtred)
+    QString filePath = file.absoluteFilePath();
+    if (!checkFileFilter(filePath) || !checkFileIgnore(filePath))
         return false;
-    QRegExp rx("");
-    rx.setPatternSyntax(QRegExp::Wildcard);
-    if (enableIgnore) {
-        for (int i=0; i < ignoreListWidget->count(); i++) {
-            rx.setPattern(QDir::fromNativeSeparators(
-                              ignoreListWidget->item(i)->text()) + "*");
-        if (rx.exactMatch(file.absoluteFilePath())) {
-            return false;
-        }
-        }
-    }
     QFileInfo dstFile(outputDir +
                       sourceFiles->getDstPath(file.absoluteFilePath(), index));
-
     if (dstFile.exists() &&
             qAbs((dstFile.lastModified().secsTo(file.lastModified()))) < 5) {
         outputFiles.remove(dstFile.absoluteFilePath());
         return false;
     }
-    return filtred;
+    return true;
 }
 
 bool ThreadCopy::checkFileFilter(QString file) {
-    QRegExp rx("");
-    rx.setPatternSyntax(QRegExp::Wildcard);
-    bool filtred = !enableFilter;
     if (enableFilter) {
         for (int i=0; i < filterListWidget->count(); i++) {
-            rx.setPattern("*." + filterListWidget->item(i)->text());
-            if (rx.exactMatch(file)) {
-                filtred = true;
-                break;
+            wildcard.setPattern("*." + filterListWidget->item(i)->text());
+            if (wildcard.exactMatch(file)) {
+                return true;
             }
         }
     }
-    return filtred;
+    return false;
+}
+
+bool ThreadCopy::checkFileIgnore(QString file) {
+    if (enableIgnore) {
+        for (int i=0; i < ignoreListWidget->count(); i++) {
+            wildcard.setPattern(QDir::fromNativeSeparators(
+                              ignoreListWidget->item(i)->text()) + "*");
+            if (wildcard.exactMatch(file)) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 int ThreadCopy::checkLimits(QFileInfo srcFileInfo, int copiedFileSize) {
@@ -286,6 +287,8 @@ void ThreadCopy::scan() {
 
 int ThreadCopy::scanDir(QString pathDir, int index) {
     if (getStopFlag())
+        return 0;
+    if (!checkFileIgnore(QDir::fromNativeSeparators(pathDir)))
         return 0;
     QDir dir(pathDir);
     int filesFound = 0;
