@@ -30,10 +30,18 @@ private:
         bool value;
         QString echo;
     };
+    struct Progress {
+        float min;
+        float max;
+        float val;
+    };
+
     enum {LIMIT_REACHED, TRY_OTHER_FILE, LIMIT_OK};
     enum {DISK_SIZE_LIMIT, RESERVED_SPACE_LIMIT, COPIED_SIZE_LIMIT,
-          DEST_SIZE_LIMIT};
-    static const int LIMITS_COUNT = 4;
+          DEST_SIZE_LIMIT, FILE_COUNT_LIMIT, QUEUE_LIMIT};
+    static const int LIMITS_COUNT = 4; // without QUEUE_LIMIT
+    static const int FULL_LIMITS_COUNT = LIMITS_COUNT + 2;
+        // with QUEUE_LIMIT and FILE_COUNT_LIMIT
 
     bool allwaysTryOtherFile;
     int answer;
@@ -50,6 +58,7 @@ private:
     QString outputDir;
     quint64 outDirSize;
     QHash<QString, bool> outputFiles;
+    Progress progress[FULL_LIMITS_COUNT];
     Settings *settings;
     SourceFiles *sourceFiles;
     int sleepTime;
@@ -64,10 +73,13 @@ private:
     void copy();
     void deleteOldFiles();
     quint64 getDirSize(QString path);
+    int getMaxProgress();
     int getSleep();
     bool getStopFlag();
     QString getTextQuestion(int limit, QFileInfo srcFileInfo);
     void prepareLimitsTable();
+    void prepareProgressTable();
+    void refreshProgressTable(QFileInfo srcFileInfo);
     void scan();
     int scanDir(QString pathDir, int index);
     void scanOutput(QString pathDir);
@@ -83,6 +95,7 @@ signals:
     void fileQueueChanged(int);
     void print(QString);
     void scanFinished();
+    void progressChanged(int);
     void question(QString);
 };
 

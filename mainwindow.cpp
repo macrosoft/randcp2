@@ -141,11 +141,14 @@ void MainWindow::startCopy() {
                 threadCopy, SLOT(setSleep(int)));
         connect(threadCopy, SIGNAL(question(QString)),
                 SLOT(showQuestionMsg(QString)));
+        connect(threadCopy, SIGNAL(progressChanged(int)),
+                SLOT(setProgressBar(int)));
         for (int i=0; i < ui->tabWidget->count()-1; i++)
             ui->tabWidget->setTabEnabled(i, false);
         ui->logTextEdit->clear();
         state = SCANING;
         ui->startButton->setText(tr("Cancel"));
+        setProgressBar(0);
         threadCopy->start();
     } else {
         QMessageBox::warning(0,tr("Can't start copying files"),
@@ -371,6 +374,10 @@ void MainWindow::scanFinished() {
     log(tr("Scanning finnished."));
     ui->startButton->setText(tr("Stop"));
     state = COPYING;
+}
+
+void MainWindow::setProgressBar(int val) {
+    ui->progressBar->setValue(val);
 }
 
 void MainWindow::selectFilterExtList() {

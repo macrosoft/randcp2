@@ -67,6 +67,7 @@ public slots:
     void outDirChanged();
     void saveSettings();
     void scanFinished();
+    void setProgressBar(int val);
     void selectFilterExtList();
     void selectIngoreList();
     void selectOutputDir();

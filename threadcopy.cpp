@@ -24,7 +24,7 @@ ThreadCopy::ThreadCopy(Settings *pSettings, SrcDirItemModel *pSrcDirModel,
     enableFileCount = settings->getBool(Settings::EN_MAXFILECOUNT);
     minFreeSpace = settings->getDouble(Settings::MINFREESPACE)*1024*1024;
     limit = settings->getDouble(Settings::LIMIT)*1024*1024;
-    maxDst = settings->getDouble(Settings::MAXDST);
+    maxDst = settings->getDouble(Settings::MAXDST)*1024*1024;
     stopFlag = false;
     setSleep(nSleep);
     prepareLimitsTable();
@@ -148,6 +148,7 @@ void ThreadCopy::copy() {
     int maxFileCount = settings->getInt(Settings::MAXFILECOUNT);
     quint64 copiedFileSize = 0;
     outDirSize = getDirSize(outputDir);
+    prepareProgressTable();
     while (!sourceFiles->isEmpty()) {
         if (getStopFlag()) {
             emit print(tr("***Stoped!***"));
@@ -166,12 +167,18 @@ void ThreadCopy::copy() {
             dest.remove();
         }
         QFileInfo srcFileInfo(srcFile);
+        progress[QUEUE_LIMIT].val++;
         int check = checkLimits(srcFileInfo, copiedFileSize);
-        if (check == LIMIT_REACHED)
+        if (check == LIMIT_REACHED) {
+            emit progressChanged(100);
             break;
+        }
         emit fileQueueChanged(sourceFiles->size());
-        if (check == TRY_OTHER_FILE)
+        if (check == TRY_OTHER_FILE) {
+            emit progressChanged(getMaxProgress());
             continue;
+        }
+        refreshProgressTable(srcFileInfo);
         copiedFileSize += srcFileInfo.size();
         emit print(tr("Copy %1").arg(QDir::toNativeSeparators(srcFile)));
         emit print(tr("to %2").arg(QDir::toNativeSeparators(dstFile)));
@@ -189,12 +196,15 @@ void ThreadCopy::copy() {
         touch->waitForFinished();
         touch->deleteLater();
         #endif
-
-        if (enableFileCount && ++fileCount >= maxFileCount) {
+        fileCount++;
+        progress[FILE_COUNT_LIMIT].val = fileCount;
+        if (enableFileCount && fileCount >= maxFileCount) {
+            emit progressChanged(100);
             emit print(tr("The max file amount is reached."));
             break;
         }
         emit changeDiskFreeSpace();
+        emit progressChanged(getMaxProgress());
         this->msleep(getSleep());
     }
 }
@@ -227,6 +237,21 @@ quint64 ThreadCopy::getDirSize(QString path) {
     }
 
     return size;
+}
+
+int ThreadCopy::getMaxProgress() {
+    int max = 0;
+    for (int i = 0; i < FULL_LIMITS_COUNT; i++) {
+        if (progress[i].max > 0) {
+            float diff = (progress[i].max - progress[i].min);
+            if (diff <= 0) {
+                return 100;
+            }
+            int val = qRound(progress[i].val*100/diff);
+            max = (max > val)? max: val;
+        }
+    }
+    return max;
 }
 
 int ThreadCopy::getSleep() {
@@ -275,6 +300,37 @@ void ThreadCopy::prepareLimitsTable() {
     limits[DEST_SIZE_LIMIT].enable = settings->getBool(Settings::EN_MAXDST);
     limits[DEST_SIZE_LIMIT].echo =
             tr("The max output directory size amount is reached.");
+}
+
+void ThreadCopy::prepareProgressTable() {
+    for (int i = 0; i < FULL_LIMITS_COUNT; i++) {
+        progress[i].min = 0;
+        progress[i].max = 0;
+        progress[i].val = 0;
+    }
+    progress[DISK_SIZE_LIMIT].max = diskSize(outputDir);
+    if (enableFileCount) {
+        progress[FILE_COUNT_LIMIT].max =
+                settings->getInt(Settings::MAXFILECOUNT);
+    }
+    if (limits[RESERVED_SPACE_LIMIT].enable) {
+        progress[RESERVED_SPACE_LIMIT].max = diskSize(outputDir) -
+                minFreeSpace;
+    }
+    if (limits[COPIED_SIZE_LIMIT].enable)
+        progress[COPIED_SIZE_LIMIT].max = limit;
+    if (limits[DEST_SIZE_LIMIT].enable) {
+        progress[DEST_SIZE_LIMIT].min = outDirSize;
+        progress[DEST_SIZE_LIMIT].max = maxDst;
+    }
+    progress[QUEUE_LIMIT].max = sourceFiles->size();
+}
+
+void ThreadCopy::refreshProgressTable(QFileInfo srcFileInfo) {
+    progress[DISK_SIZE_LIMIT].val =
+            progress[RESERVED_SPACE_LIMIT].val =
+             progress[DEST_SIZE_LIMIT].val += srcFileInfo.size();
+    progress[COPIED_SIZE_LIMIT].val += srcFileInfo.size();
 }
 
 void ThreadCopy::scan() {
