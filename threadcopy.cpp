@@ -33,6 +33,7 @@ ThreadCopy::ThreadCopy(Settings *pSettings, SrcDirItemModel *pSrcDirModel,
     wildcard.setCaseSensitivity(Qt::CaseInsensitive);
     #endif
     wildcard.setPatternSyntax(QRegExp::Wildcard);
+    allwaysTryOtherFile = false;
 }
 
 ThreadCopy::~ThreadCopy() {
@@ -126,9 +127,15 @@ int ThreadCopy::checkLimits(QFileInfo srcFileInfo, int copiedFileSize) {
             outDirSize + copiedFileSize + srcFileInfo.size() > maxDst;
     for (int i = 0; i < LIMITS_COUNT; i++) {
         if (limits[i].enable && limits[i].value) {
+            if (allwaysTryOtherFile)
+                return TRY_OTHER_FILE;
             showQuestion(getTextQuestion(i, srcFileInfo));
             if (answer == QMessageBox::Yes)
                 return TRY_OTHER_FILE;
+            if (answer == QMessageBox::YesToAll) {
+                allwaysTryOtherFile = true;
+                return TRY_OTHER_FILE;
+            }
             emit print(limits[i].echo);
             return LIMIT_REACHED;
         }

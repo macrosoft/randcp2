@@ -35,6 +35,7 @@ private:
           DEST_SIZE_LIMIT};
     static const int LIMITS_COUNT = 4;
 
+    bool allwaysTryOtherFile;
     int answer;
     bool enableFileCount;
     bool enableFilter;

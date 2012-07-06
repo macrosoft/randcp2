@@ -431,7 +431,8 @@ void MainWindow::setEnabledIgnore(bool enable) {
 void MainWindow::showQuestionMsg(QString question) {
     QMessageBox *msg = new QMessageBox(QMessageBox::Information,
                             tr("Limit is reached"), question,
-                            QMessageBox::Yes | QMessageBox::No);
+                            QMessageBox::Yes | QMessageBox::YesAll |
+                            QMessageBox::No);
     int answer = msg->exec();
     threadCopy->setAnswer(answer);
     threadCopy->questionWait.wakeAll();
