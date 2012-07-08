@@ -104,7 +104,7 @@ void MainWindow::loadSettings() {
     ui->freeSpaceSpinBox->setValue(settings->getDouble(Settings::MINFREESPACE));
     ui->limitCheckBox->setChecked(settings->getBool(Settings::EN_LIMIT));
     ui->limitSpinBox->setEnabled(settings->getBool(Settings::EN_LIMIT));
-    ui->limitSpinBox->setValue(settings->getDouble(Settings::LIMIT));
+    ui->limitSpinBox->setValue(settings->getDouble(Settings::SIZE_LIMIT));
     ui->maxDstCheckBox->setChecked(settings->getBool(Settings::EN_MAXDST));
     ui->maxDstSpinBox->setEnabled(settings->getBool(Settings::EN_MAXDST));
     ui->maxDstSpinBox->setValue(settings->getDouble(Settings::MAXDST));
@@ -245,7 +245,7 @@ void MainWindow::changeSettings() {
         settings->setBool(Settings::EN_LIMIT,
                           ui->limitCheckBox->checkState());
     else if (s == ui->limitSpinBox)
-        settings->setDouble(Settings::LIMIT, ui->limitSpinBox->value());
+        settings->setDouble(Settings::SIZE_LIMIT, ui->limitSpinBox->value());
     else if (s == ui->maxDstCheckBox)
         settings->setBool(Settings::EN_MAXDST,
                           ui->maxDstCheckBox->checkState());

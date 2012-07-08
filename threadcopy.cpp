@@ -21,23 +21,20 @@ ThreadCopy::ThreadCopy(Settings *pSettings, SrcDirItemModel *pSrcDirModel,
     filterListWidget = pFilterListWidget;
     enableIgnore = settings->getBool(Settings::EN_IGNOREFILTER);
     ignoreListWidget = pIgnoreListWidget;
-    enableFileCount = settings->getBool(Settings::EN_MAXFILECOUNT);
-    minFreeSpace = settings->getDouble(Settings::MINFREESPACE)*1024*1024;
-    limit = settings->getDouble(Settings::LIMIT)*1024*1024;
-    maxDst = settings->getDouble(Settings::MAXDST)*1024*1024;
     stopFlag = false;
     setSleep(nSleep);
-    prepareLimitsTable();
     answer = 0;
     #ifdef Q_OS_WIN
     wildcard.setCaseSensitivity(Qt::CaseInsensitive);
     #endif
     wildcard.setPatternSyntax(QRegExp::Wildcard);
     allwaysTryOtherFile = false;
+    progressCtrl = new ProgressControl(settings);
 }
 
 ThreadCopy::~ThreadCopy() {
     sourceFiles->~SourceFiles();
+    progressCtrl->~ProgressControl();
     emit done();
 }
 
@@ -116,27 +113,20 @@ bool ThreadCopy::checkFileIgnore(QString file) {
     return true;
 }
 
-int ThreadCopy::checkLimits(QFileInfo srcFileInfo, int copiedFileSize) {
-    quint64 reserved_free_space = diskSize(outputDir) - srcFileInfo.size();
-    limits[DISK_SIZE_LIMIT].value =
-            diskSize(outputDir) < (quint64)srcFileInfo.size();
-    limits[RESERVED_SPACE_LIMIT].value = reserved_free_space < minFreeSpace;
-    limits[COPIED_SIZE_LIMIT].value =
-            copiedFileSize + srcFileInfo.size() > limit;
-    limits[DEST_SIZE_LIMIT].value =
-            outDirSize + copiedFileSize + srcFileInfo.size() > maxDst;
-    for (int i = 0; i < LIMITS_COUNT; i++) {
-        if (limits[i].enable && limits[i].value) {
+int ThreadCopy::checkLimits(QFileInfo srcFileInfo) {
+    progressCtrl->checkLimits(srcFileInfo);
+    for (int i = 0; i < progressCtrl->getLimitsCount(); i++) {
+        if (progressCtrl->limitIsReached(i)) {
             if (allwaysTryOtherFile)
                 return TRY_OTHER_FILE;
-            showQuestion(getTextQuestion(i, srcFileInfo));
+            showQuestion(progressCtrl->getTextQuestion(i, srcFileInfo));
             if (answer == QMessageBox::Yes)
                 return TRY_OTHER_FILE;
             if (answer == QMessageBox::YesToAll) {
                 allwaysTryOtherFile = true;
                 return TRY_OTHER_FILE;
             }
-            emit print(limits[i].echo);
+            emit print(progressCtrl->say(i));
             return LIMIT_REACHED;
         }
     }
@@ -144,11 +134,9 @@ int ThreadCopy::checkLimits(QFileInfo srcFileInfo, int copiedFileSize) {
 }
 
 void ThreadCopy::copy() {
-    int fileCount = 0;
-    int maxFileCount = settings->getInt(Settings::MAXFILECOUNT);
+    progressCtrl->prepare(sourceFiles->size(), getDirSize(outputDir));
     quint64 copiedFileSize = 0;
     outDirSize = getDirSize(outputDir);
-    prepareProgressTable();
     while (!sourceFiles->isEmpty()) {
         if (getStopFlag()) {
             emit print(tr("***Stoped!***"));
@@ -159,6 +147,7 @@ void ThreadCopy::copy() {
             sourceFiles->getRndFile(srcFile, dstFile);
         else
             sourceFiles->getFirstFile(srcFile, dstFile);
+        emit fileQueueChanged(sourceFiles->size());
         dstFile = outputDir + dstFile;
         QFileInfo dstFileInfo(dstFile);
         if (dstFileInfo.exists()) {
@@ -167,18 +156,14 @@ void ThreadCopy::copy() {
             dest.remove();
         }
         QFileInfo srcFileInfo(srcFile);
-        progress[QUEUE_LIMIT].val++;
-        int check = checkLimits(srcFileInfo, copiedFileSize);
+        int check = checkLimits(srcFileInfo);
         if (check == LIMIT_REACHED) {
             emit progressChanged(100);
             break;
-        }
-        emit fileQueueChanged(sourceFiles->size());
-        if (check == TRY_OTHER_FILE) {
-            emit progressChanged(getMaxProgress());
+        } else if (check == TRY_OTHER_FILE) {
+            emit progressChanged(progressCtrl->getMax());
             continue;
         }
-        refreshProgressTable(srcFileInfo);
         copiedFileSize += srcFileInfo.size();
         emit print(tr("Copy %1").arg(QDir::toNativeSeparators(srcFile)));
         emit print(tr("to %2").arg(QDir::toNativeSeparators(dstFile)));
@@ -188,7 +173,7 @@ void ThreadCopy::copy() {
         QFile::copy(srcFile,dstFile);
 
         #ifdef Q_OS_LINUX
-        QProcess *touch = new QProcess(this);
+        QProcess *touch = new QProcess();
         QString modifyTime =
                 srcFileInfo.lastModified().toString("yyMMddhhmm.ss");
         touch->start("touch",
@@ -196,15 +181,14 @@ void ThreadCopy::copy() {
         touch->waitForFinished();
         touch->deleteLater();
         #endif
-        fileCount++;
-        progress[FILE_COUNT_LIMIT].val = fileCount;
-        if (enableFileCount && fileCount >= maxFileCount) {
+        progressCtrl->step(srcFileInfo);
+        if (progressCtrl->fileCountLimitIsReached()) {
             emit progressChanged(100);
             emit print(tr("The max file amount is reached."));
             break;
         }
         emit changeDiskFreeSpace();
-        emit progressChanged(getMaxProgress());
+        emit progressChanged(progressCtrl->getMax());
         this->msleep(getSleep());
     }
 }
@@ -239,21 +223,6 @@ quint64 ThreadCopy::getDirSize(QString path) {
     return size;
 }
 
-int ThreadCopy::getMaxProgress() {
-    int max = 0;
-    for (int i = 0; i < FULL_LIMITS_COUNT; i++) {
-        if (progress[i].max > 0) {
-            float diff = (progress[i].max - progress[i].min);
-            if (diff <= 0) {
-                return 100;
-            }
-            int val = qRound(progress[i].val*100/diff);
-            max = (max > val)? max: val;
-        }
-    }
-    return max;
-}
-
 int ThreadCopy::getSleep() {
     QMutexLocker ml(&mutex);
     return sleepTime;
@@ -262,75 +231,6 @@ int ThreadCopy::getSleep() {
 bool ThreadCopy::getStopFlag() {
     QMutexLocker ml(&mutex);
     return stopFlag;
-}
-
-QString ThreadCopy::getTextQuestion(int limit, QFileInfo srcFileInfo) {
-    switch (limit) {
-    case DISK_SIZE_LIMIT:
-        return tr("Can`t copy file %1 (%2). %3 free. Try other file?")
-                .arg(QDir::toNativeSeparators(srcFileInfo.absoluteFilePath()))
-                .arg(sizeToStr(srcFileInfo.size()))
-                .arg(sizeToStr(diskSize(outputDir)));
-    case RESERVED_SPACE_LIMIT:
-        return tr("Can`t copy file %1 (%2). Try other file?")
-                .arg(QDir::toNativeSeparators(srcFileInfo.absoluteFilePath()))
-                .arg(sizeToStr(srcFileInfo.size()));
-    case COPIED_SIZE_LIMIT:
-        return tr("Can`t copy file %1 (%2). Try other file?")
-                .arg(QDir::toNativeSeparators(srcFileInfo.absoluteFilePath()))
-                .arg(sizeToStr(srcFileInfo.size()));
-    case DEST_SIZE_LIMIT:
-        return tr("Can`t copy file %1 (%2). Try other file?")
-                .arg(QDir::toNativeSeparators(srcFileInfo.absoluteFilePath()))
-                .arg(sizeToStr(srcFileInfo.size()));
-    }
-    return QString();
-}
-
-void ThreadCopy::prepareLimitsTable() {
-    limits[DISK_SIZE_LIMIT].enable = true;
-    limits[DISK_SIZE_LIMIT].echo = tr("No free disk space!");
-    limits[RESERVED_SPACE_LIMIT].enable =
-            settings->getBool(Settings::EN_MINFREESPACE);
-    limits[RESERVED_SPACE_LIMIT].echo =
-            tr("The min free space amount is reached.");
-    limits[COPIED_SIZE_LIMIT].enable = settings->getBool(Settings::EN_LIMIT);
-    limits[COPIED_SIZE_LIMIT].echo =
-            tr("The max copied file size amount is reached.");
-    limits[DEST_SIZE_LIMIT].enable = settings->getBool(Settings::EN_MAXDST);
-    limits[DEST_SIZE_LIMIT].echo =
-            tr("The max output directory size amount is reached.");
-}
-
-void ThreadCopy::prepareProgressTable() {
-    for (int i = 0; i < FULL_LIMITS_COUNT; i++) {
-        progress[i].min = 0;
-        progress[i].max = 0;
-        progress[i].val = 0;
-    }
-    progress[DISK_SIZE_LIMIT].max = diskSize(outputDir);
-    if (enableFileCount) {
-        progress[FILE_COUNT_LIMIT].max =
-                settings->getInt(Settings::MAXFILECOUNT);
-    }
-    if (limits[RESERVED_SPACE_LIMIT].enable) {
-        progress[RESERVED_SPACE_LIMIT].max = diskSize(outputDir) -
-                minFreeSpace;
-    }
-    if (limits[COPIED_SIZE_LIMIT].enable)
-        progress[COPIED_SIZE_LIMIT].max = limit;
-    if (limits[DEST_SIZE_LIMIT].enable) {
-        progress[DEST_SIZE_LIMIT].min = outDirSize;
-        progress[DEST_SIZE_LIMIT].max = maxDst;
-    }
-    progress[QUEUE_LIMIT].max = sourceFiles->size();
-}
-
-void ThreadCopy::refreshProgressTable(QFileInfo srcFileInfo) {
-    progress[DISK_SIZE_LIMIT].val =
-            progress[RESERVED_SPACE_LIMIT].val =
-             progress[DEST_SIZE_LIMIT].val += srcFileInfo.size();
-    progress[COPIED_SIZE_LIMIT].val += srcFileInfo.size();
 }
 
 void ThreadCopy::scan() {

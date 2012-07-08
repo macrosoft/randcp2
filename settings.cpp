@@ -15,7 +15,7 @@ Settings::Settings() {
     keys[EN_MINFREESPACE] = "enminfreespace";
     keys[MINFREESPACE] = "minfreespace";
     keys[EN_LIMIT] = "enlimit";
-    keys[LIMIT] = "limit";
+    keys[SIZE_LIMIT] = "limit";
     keys[EN_MAXDST] = "enmaxdst";
     keys[MAXDST] = "maxdst";
 }

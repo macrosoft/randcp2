@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     additionalpath.cpp \
     droplistwidget.cpp \
     droplineedit.cpp \
-    settings.cpp
+    settings.cpp \
+    progresscontrol.cpp
 
 HEADERS  += mainwindowdf.h \
     sourcefiles.h \
@@ -30,7 +31,8 @@ HEADERS  += mainwindowdf.h \
     additionalpath.h \
     droplistwidget.h \
     droplineedit.h \
-    settings.h
+    settings.h \
+    progresscontrol.h
 
 FORMS += \
     mainwindow.ui

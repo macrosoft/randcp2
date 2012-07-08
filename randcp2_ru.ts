@@ -5,8 +5,8 @@
     <name>MainWindow</name>
     <message>
         <location filename="mainwindow.ui" line="14"/>
-        <source>randcp 2.6.3.c</source>
-        <oldsource>randcp 2.6.3.b</oldsource>
+        <source>randcp 2.7</source>
+        <oldsource>randcp 2.6.3.c</oldsource>
         <translation></translation>
     </message>
     <message>
@@ -153,13 +153,13 @@
         <translation>Пауза (мс):</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="532"/>
-        <location filename="mainwindow.cpp" line="275"/>
+        <location filename="mainwindow.ui" line="542"/>
+        <location filename="mainwindow.cpp" line="278"/>
         <source>Start</source>
         <translation>Старт</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="573"/>
+        <location filename="mainwindow.ui" line="583"/>
         <source>Save</source>
         <translation>Сохранить</translation>
     </message>
@@ -169,94 +169,129 @@
         <translation>***Сканирование отменено!***</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="148"/>
+        <location filename="mainwindow.cpp" line="150"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="151"/>
+        <location filename="mainwindow.cpp" line="154"/>
         <source>Can&apos;t start copying files</source>
         <translation>Не могу начать копировать файлы</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="152"/>
+        <location filename="mainwindow.cpp" line="155"/>
         <source>Select the output directory</source>
         <translation>Выберите выходную директорию</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="163"/>
+        <location filename="mainwindow.cpp" line="166"/>
         <source>Select source directory</source>
         <translation>Выберите входную директорию</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="181"/>
-        <location filename="mainwindow.cpp" line="302"/>
+        <location filename="mainwindow.cpp" line="184"/>
+        <location filename="mainwindow.cpp" line="305"/>
         <source>Select ignore directory</source>
         <translation>Выберите игнорируемую директорию</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="195"/>
-        <location filename="mainwindow.cpp" line="306"/>
+        <location filename="mainwindow.cpp" line="198"/>
+        <location filename="mainwindow.cpp" line="309"/>
         <source>Select ignore file</source>
         <translation>Выбирите игнорируемый файл</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="268"/>
+        <location filename="mainwindow.cpp" line="271"/>
         <source>Files in queue: %1</source>
         <translation>Файлов в очереди: %1</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="276"/>
+        <location filename="mainwindow.cpp" line="279"/>
         <source>Done!</source>
         <translation>Готово!</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="371"/>
+        <location filename="mainwindow.cpp" line="374"/>
         <source>Scanning finnished.</source>
         <translation>Сканирование завершено.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="372"/>
+        <location filename="mainwindow.cpp" line="375"/>
         <source>Stop</source>
         <translation>Остановить</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="387"/>
+        <location filename="mainwindow.cpp" line="394"/>
         <source>Select output directory</source>
         <translation>Выберите выходную директорию</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="433"/>
+        <location filename="mainwindow.cpp" line="440"/>
         <source>Limit is reached</source>
         <translation>Лимит достигнут</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="442"/>
+        <location filename="mainwindow.cpp" line="450"/>
         <source>Free disk space: %1</source>
         <oldsource>Free disk space: </oldsource>
         <translation>Свободное место: %1</translation>
     </message>
 </context>
 <context>
+    <name>QObject</name>
+    <message>
+        <location filename="progresscontrol.cpp" line="31"/>
+        <source>Can`t copy file %1 (%2). %3 free. Try other file?</source>
+        <translation>Не могу скорировать файл %1 (%2). Свободно: %3. Попробовать другой файл?</translation>
+    </message>
+    <message>
+        <location filename="progresscontrol.cpp" line="36"/>
+        <location filename="progresscontrol.cpp" line="40"/>
+        <location filename="progresscontrol.cpp" line="44"/>
+        <source>Can`t copy file %1 (%2). Try other file?</source>
+        <translation>Не могу скорировать файл %1 (%2). Попробовать другой файл?</translation>
+    </message>
+    <message>
+        <location filename="progresscontrol.cpp" line="84"/>
+        <source>No free disk space!</source>
+        <translation>Нет свободного места на диске!</translation>
+    </message>
+    <message>
+        <location filename="progresscontrol.cpp" line="89"/>
+        <source>The min free space amount is reached.</source>
+        <translation>Достигнут лимит минимального свободного места на диске.</translation>
+    </message>
+    <message>
+        <location filename="progresscontrol.cpp" line="95"/>
+        <source>The max copied file size amount is reached.</source>
+        <translation>Достигнут лимит максимального размера копируемых файлов.</translation>
+    </message>
+    <message>
+        <location filename="progresscontrol.cpp" line="101"/>
+        <source>The max output directory size amount is reached.</source>
+        <translation>Достигнут лимит максимального размера выходной директории.</translation>
+    </message>
+</context>
+<context>
     <name>ThreadCopy</name>
     <message>
-        <location filename="threadcopy.cpp" line="46"/>
+        <location filename="threadcopy.cpp" line="48"/>
         <source>Creating output directory</source>
         <translation>Создаю выходную директорию</translation>
     </message>
     <message>
-        <location filename="threadcopy.cpp" line="49"/>
+        <location filename="threadcopy.cpp" line="51"/>
         <source>Can not create output directory :(</source>
         <translation>Не удалось создать выходную директорию :(</translation>
     </message>
     <message>
-        <location filename="threadcopy.cpp" line="145"/>
+        <location filename="threadcopy.cpp" line="142"/>
         <source>***Stoped!***</source>
         <translation>***Остановлено!***</translation>
     </message>
     <message>
-        <location filename="threadcopy.cpp" line="156"/>
-        <location filename="threadcopy.cpp" line="200"/>
+        <location filename="threadcopy.cpp" line="154"/>
+        <location filename="threadcopy.cpp" line="202"/>
         <source>Remove %1</source>
         <translation>Удаляю %1</translation>
     </message>
@@ -271,54 +306,46 @@
         <translation>в %2</translation>
     </message>
     <message>
-        <location filename="threadcopy.cpp" line="186"/>
+        <location filename="threadcopy.cpp" line="187"/>
         <source>The max file amount is reached.</source>
         <translation>Достигнут лимит максимального количества файлов.</translation>
     </message>
     <message>
-        <location filename="threadcopy.cpp" line="237"/>
         <source>Can`t copy file %1 (%2). %3 free. Try other file?</source>
-        <translation>Не могу скорировать файл %1 (%2). Свободно: %3. Попробовать другой файл?</translation>
+        <translation type="obsolete">Не могу скорировать файл %1 (%2). Свободно: %3. Попробовать другой файл?</translation>
     </message>
     <message>
-        <location filename="threadcopy.cpp" line="242"/>
-        <location filename="threadcopy.cpp" line="246"/>
-        <location filename="threadcopy.cpp" line="250"/>
         <source>Can`t copy file %1 (%2). Try other file?</source>
-        <translation>Не могу скорировать файл %1 (%2). Попробовать другой файл?</translation>
+        <translation type="obsolete">Не могу скорировать файл %1 (%2). Попробовать другой файл?</translation>
     </message>
     <message>
-        <location filename="threadcopy.cpp" line="259"/>
         <source>No free disk space!</source>
-        <translation>Нет свободного места на диске!</translation>
+        <translation type="obsolete">Нет свободного места на диске!</translation>
     </message>
     <message>
-        <location filename="threadcopy.cpp" line="263"/>
         <source>The min free space amount is reached.</source>
-        <translation>Достигнут лимит минимального свободного места на диске.</translation>
+        <translation type="obsolete">Достигнут лимит минимального свободного места на диске.</translation>
     </message>
     <message>
-        <location filename="threadcopy.cpp" line="266"/>
         <source>The max copied file size amount is reached.</source>
-        <translation>Достигнут лимит максимального размера копируемых файлов.</translation>
+        <translation type="obsolete">Достигнут лимит максимального размера копируемых файлов.</translation>
     </message>
     <message>
-        <location filename="threadcopy.cpp" line="269"/>
         <source>The max output directory size amount is reached.</source>
-        <translation>Достигнут лимит максимального размера выходной директории.</translation>
+        <translation type="obsolete">Достигнут лимит максимального размера выходной директории.</translation>
     </message>
     <message>
-        <location filename="threadcopy.cpp" line="276"/>
+        <location filename="threadcopy.cpp" line="240"/>
         <source>Scanning directories: %1 of %2</source>
         <translation>Сканирование директорий: %1 из %2</translation>
     </message>
     <message>
-        <location filename="threadcopy.cpp" line="278"/>
+        <location filename="threadcopy.cpp" line="242"/>
         <source>Scanning: %1</source>
         <translation>Сканирование: %1</translation>
     </message>
     <message>
-        <location filename="threadcopy.cpp" line="280"/>
+        <location filename="threadcopy.cpp" line="244"/>
         <source>Files found: %1</source>
         <translation>Файлов найдено: %1</translation>
     </message>
