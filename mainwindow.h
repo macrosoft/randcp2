@@ -30,6 +30,8 @@ private:
     Settings *settings;
     SrcDirItemModel *srcDirModel;
     int state;
+    int time;
+    QTimer *timer;
     ThreadCopy *threadCopy;
     Ui::MainWindow *ui;
 
@@ -42,6 +44,7 @@ private:
     void refreshParentDirLevel(int level);
     void startCopy();
     bool selectSrcDir();
+    void setTimeEstimate(int sec);
     void stop();
 
 public slots:
@@ -64,6 +67,7 @@ public slots:
     void editSrcDirListLineEdit(QString path);
     void log(QString msg);
     void pressStartButton();
+    void timerTick();
     void outDirChanged();
     void saveSettings();
     void scanFinished();
@@ -77,6 +81,7 @@ public slots:
     void setEnabledFilter(bool enable);
     void setEnabledIgnore(bool enable);
     void showQuestionMsg(QString question);
+    void run__Timer();
     void updateDiskFreeSpace();
 
 signals:

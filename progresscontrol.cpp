@@ -23,7 +23,8 @@ void ProgressControl::checkLimits(QFileInfo srcFileInfo) {
 }
 
 bool ProgressControl::fileCountLimitIsReached() {
-    return limits[FILE_COUNT_LIMIT].max <= limits[FILE_COUNT_LIMIT].val;
+    return limits[FILE_COUNT_LIMIT].enable &&
+            (limits[FILE_COUNT_LIMIT].max <= limits[FILE_COUNT_LIMIT].val);
 }
 
 QString ProgressControl::getTextQuestion(int limit, QFileInfo srcFileInfo) {
@@ -54,17 +55,23 @@ int ProgressControl::getLimitsCount() {
 }
 
 int ProgressControl::getMax() {
-    int max = 0;
+    return qRound(getRealMax());
+}
+
+float ProgressControl::getRealMax() {
+    mutex.lock();
+    float max = 0;
     for (int i = 0; i < FULL_LIMITS_COUNT; i++) {
         if (limits[i].enable) {
             float diff = (limits[i].max - limits[i].min);
             if (diff <= 0) {
                 return 100;
             }
-            int val = qRound(limits[i].val*100/diff);
+            float val = limits[i].val*100/diff;
             max = (max > val)? max: val;
         }
     }
+    mutex.unlock();
     return max;
 }
 
@@ -121,9 +128,11 @@ QString ProgressControl::say(int numb) {
 
 
 void ProgressControl::step(QFileInfo srcFileInfo) {
+    mutex.lock();
     limits[DISK_SIZE_LIMIT].val =
         limits[RESERVED_SPACE_LIMIT].val =
         limits[DEST_SIZE_LIMIT].val =
         limits[COPIED_SIZE_LIMIT].val += srcFileInfo.size();
     limits[FILE_COUNT_LIMIT].val++;
+    mutex.unlock();
 }

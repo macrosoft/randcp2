@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>randcp 2.7</string>
+   <string>randcp 2.7.1</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
    <property name="spacing">
@@ -372,7 +372,7 @@
             <number>1</number>
            </property>
            <property name="maximum">
-            <number>1048576</number>
+            <number>2147483647</number>
            </property>
           </widget>
          </item>
@@ -501,6 +501,20 @@
             </size>
            </property>
           </spacer>
+         </item>
+         <item row="1" column="2">
+          <widget class="QLabel" name="timeLabelCapt">
+           <property name="text">
+            <string>Time estimate:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="3">
+          <widget class="QLabel" name="timeLabel">
+           <property name="text">
+            <string>--:--</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>

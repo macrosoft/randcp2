@@ -28,6 +28,9 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     threadCopy = NULL;
     state = READY;
+    timer = new QTimer(this);
+    timer->setInterval(1000);
+    connect(timer,SIGNAL(timeout()),SLOT(timerTick()));
 }
 
 MainWindow::~MainWindow() {
@@ -143,6 +146,7 @@ void MainWindow::startCopy() {
                 SLOT(showQuestionMsg(QString)));
         connect(threadCopy, SIGNAL(progressChanged(int)),
                 SLOT(setProgressBar(int)));
+        connect(threadCopy, SIGNAL(runTimer()), SLOT(run__Timer()));
         for (int i=0; i < ui->tabWidget->count()-1; i++)
             ui->tabWidget->setTabEnabled(i, false);
         ui->logTextEdit->clear();
@@ -170,6 +174,23 @@ bool MainWindow::selectSrcDir() {
         return true;
     }
     return false;
+}
+
+void MainWindow::setTimeEstimate(int sec) {
+    if (sec > 0) {
+        int ss = sec % 60;
+        sec /= 60;
+        int mm = sec %60;
+        sec /= 60;
+        int hh = sec;
+        QTime time(hh,mm,ss);
+        if (hh > 0)
+            ui->timeLabel->setText(time.toString("hh:mm:ss"));
+        else
+            ui->timeLabel->setText(time.toString("mm:ss"));
+    } else {
+        ui->timeLabel->setText(tr("--:--"));
+    }
 }
 
 void MainWindow::stop() {
@@ -276,6 +297,8 @@ void MainWindow::doneCoping() {
         ui->tabWidget->setTabEnabled(i, true);
     ui->startButton->setEnabled(true);
     ui->startButton->setText(tr("Start"));
+    timer->stop();
+    setTimeEstimate(-1);
     log(tr("Done!"));
     state = READY;
 }
@@ -353,6 +376,17 @@ void MainWindow::pressStartButton() {
         case COPYING: stop();
         break;
     }
+}
+
+void MainWindow::timerTick() {
+    time++;
+    float progress = threadCopy->getProgressMax();
+    if (progress <= 0)
+        setTimeEstimate(-1);
+    if (progress >= 100)
+        setTimeEstimate(1);
+    int estimateTime = time/progress*(100 - progress);
+        setTimeEstimate(estimateTime);
 }
 
 void MainWindow::outDirChanged() {
@@ -436,13 +470,20 @@ void MainWindow::setEnabledIgnore(bool enable) {
 }
 
 void MainWindow::showQuestionMsg(QString question) {
+    timer->stop();
     QMessageBox *msg = new QMessageBox(QMessageBox::Information,
                             tr("Limit is reached"), question,
                             QMessageBox::Yes | QMessageBox::YesAll |
                             QMessageBox::No);
     int answer = msg->exec();
     threadCopy->setAnswer(answer);
+    timer->start();
     threadCopy->questionWait.wakeAll();
+}
+
+void MainWindow::run__Timer() {
+    time = 0;
+    timer->start();
 }
 
 void MainWindow::updateDiskFreeSpace() {
@@ -457,4 +498,3 @@ void MainWindow::delIgnoreList() {
     ui->delIgnoreButton->setEnabled(false);
     ui->editIgnoreButton->setEnabled(false);
 }
-

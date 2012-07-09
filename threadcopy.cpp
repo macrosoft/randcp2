@@ -89,25 +89,25 @@ bool ThreadCopy::checkFile(QFileInfo file, int index) {
 }
 
 bool ThreadCopy::checkFileFilter(QString file) {
-    if (enableFilter) {
-        for (int i=0; i < filterListWidget->count(); i++) {
-            wildcard.setPattern("*." + filterListWidget->item(i)->text());
-            if (wildcard.exactMatch(file)) {
-                return true;
-            }
+    if (!enableFilter)
+        return true;
+    for (int i=0; i < filterListWidget->count(); i++) {
+        wildcard.setPattern("*." + filterListWidget->item(i)->text());
+        if (wildcard.exactMatch(file)) {
+            return true;
         }
     }
     return false;
 }
 
 bool ThreadCopy::checkFileIgnore(QString file) {
-    if (enableIgnore) {
-        for (int i=0; i < ignoreListWidget->count(); i++) {
-            wildcard.setPattern(QDir::fromNativeSeparators(
-                              ignoreListWidget->item(i)->text()) + "*");
-            if (wildcard.exactMatch(file)) {
-                return false;
-            }
+    if (!enableIgnore)
+        return true;
+    for (int i=0; i < ignoreListWidget->count(); i++) {
+        wildcard.setPattern(QDir::fromNativeSeparators(
+                          ignoreListWidget->item(i)->text()) + "*");
+        if (wildcard.exactMatch(file)) {
+            return false;
         }
     }
     return true;
@@ -135,6 +135,7 @@ int ThreadCopy::checkLimits(QFileInfo srcFileInfo) {
 
 void ThreadCopy::copy() {
     progressCtrl->prepare(sourceFiles->size(), getDirSize(outputDir));
+    emit runTimer();
     quint64 copiedFileSize = 0;
     outDirSize = getDirSize(outputDir);
     while (!sourceFiles->isEmpty()) {
@@ -223,6 +224,10 @@ quint64 ThreadCopy::getDirSize(QString path) {
     return size;
 }
 
+float ThreadCopy::getProgressMax() {
+    return progressCtrl->getRealMax();
+}
+
 int ThreadCopy::getSleep() {
     QMutexLocker ml(&mutex);
     return sleepTime;
@@ -296,7 +301,7 @@ void ThreadCopy::showQuestion(QString q) {
     questionMutex.unlock();
 }
 
-//slots
+//public slots
 
 void ThreadCopy::setSleep(int nSleep) {
     QMutexLocker ml(&mutex);
@@ -307,4 +312,3 @@ void ThreadCopy::stop() {
     QMutexLocker ml(&mutex);
     stopFlag = true;
 }
-

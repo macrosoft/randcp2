@@ -2,6 +2,7 @@
 #define PROGRESSCONTROL_H
 
 #include <QFileInfo>
+#include <QMutex>
 
 #include "settings.h"
 
@@ -16,6 +17,7 @@ public:
     QString getTextQuestion(int limit, QFileInfo srcFileInfo);
     int getLimitsCount();
     int getMax();
+    float getRealMax();
     bool limitIsReached(int numb);
     void prepare(int sourceFileCount, quint64 outDirSize);
     QString say(int numb);
@@ -37,6 +39,7 @@ private:
     static const int FULL_LIMITS_COUNT = LIMITS_COUNT + 2;
         // with QUEUE_LIMIT and FILE_COUNT_LIMIT
     Limit limits[FULL_LIMITS_COUNT];
+    QMutex mutex;
     Settings *settings;
 };
 

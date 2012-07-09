@@ -24,6 +24,7 @@ public:
     ~ThreadCopy();
     void run();
     void setAnswer(int ans);
+    float getProgressMax();
 
 private:
     enum {LIMIT_REACHED, TRY_OTHER_FILE, LIMIT_OK};
@@ -71,6 +72,7 @@ signals:
     void fileQueueChanged(int);
     void print(QString);
     void scanFinished();
+    void runTimer();
     void progressChanged(int);
     void question(QString);
 };
