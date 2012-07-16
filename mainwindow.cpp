@@ -312,6 +312,7 @@ void MainWindow::doneCoping() {
     setTimeEstimate(-1);
     log(tr("Done!"));
     state = READY;
+    QApplication::alert(this);
 }
 
 void MainWindow::enableFileCount(bool enable) {
