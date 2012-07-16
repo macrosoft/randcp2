@@ -46,7 +46,7 @@ void MainWindow::cancelScan() {
     emit stopThread();
 }
 
-QString MainWindow::getLastSelectedIgnoreDir() {
+QString MainWindow::getLastSelectedIgnore() {
     int row = ui->ignoreListWidget->currentRow();
     if (row >= 0)
         return ui->ignoreListWidget->item(row)->text();
@@ -146,7 +146,7 @@ void MainWindow::startCopy() {
                 SLOT(showQuestionMsg(QString)));
         connect(threadCopy, SIGNAL(progressChanged(int)),
                 SLOT(setProgressBar(int)));
-        connect(threadCopy, SIGNAL(runTimer()), SLOT(run__Timer()));
+        connect(threadCopy, SIGNAL(runTimer()), SLOT(runTimer()));
         for (int i=0; i < ui->tabWidget->count()-1; i++)
             ui->tabWidget->setTabEnabled(i, false);
         ui->logTextEdit->clear();
@@ -203,7 +203,7 @@ void MainWindow::stop() {
 void MainWindow::addDirIgnoreList() {
     QString ignoreDir = QFileDialog::getExistingDirectory(this,
                         tr("Select ignore directory"),
-                        getLastSelectedIgnoreDir());
+                        getLastSelectedIgnore());
     if (!ignoreDir.isEmpty()) {
         QListWidgetItem *item = new QListWidgetItem(
                     QDir::toNativeSeparators(ignoreDir));
@@ -217,7 +217,7 @@ void MainWindow::addDirIgnoreList() {
 void MainWindow::addFileIgnoreList() {
     QString fileName = QFileDialog::getOpenFileName(this,
                             tr("Select ignore file"),
-                            getLastSelectedIgnoreDir());
+                            getLastSelectedIgnore());
     if (!fileName.isEmpty()) {
         QListWidgetItem *item = new QListWidgetItem(
                     QDir::toNativeSeparators(fileName));
@@ -240,6 +240,17 @@ void MainWindow::addSrcDir() {
         ui->srcLineEdit->clear();
         ui->srcStatusLabel->clear();
         ui->parentDirSpinBox->setEnabled(false);
+    }
+}
+
+void MainWindow::addStringIgnoreList() {
+    QString ignoreStr = QInputDialog::getText(this,tr("Adding string"),
+                            tr("Add a new string to ignore list"),
+                            QLineEdit::Normal, getLastSelectedIgnore());
+    if (!ignoreStr.isEmpty()) {
+        QListWidgetItem *item = new QListWidgetItem(ignoreStr);
+        item->setFlags(item->flags() | Qt::ItemIsEditable);
+        ui->ignoreListWidget->addItem(item);
     }
 }
 
@@ -327,10 +338,14 @@ void MainWindow::editIgnoreList() {
         newPath = QFileDialog::getExistingDirectory(this,
                                     tr("Select ignore directory"),
                                     oldPath);
-    } else {
+    } else if (oldFile.isFile()) {
         newPath = QFileDialog::getOpenFileName(this,
                                 tr("Select ignore file"),
                                 oldFile.path());
+    } else  {
+        newPath = QInputDialog::getText(this,tr("Adding string"),
+                    tr("Add a string to ignore list"),
+                    QLineEdit::Normal, getLastSelectedIgnore());
     }
     if (!newPath.isEmpty())
         ui->ignoreListWidget->currentItem()->setText(
@@ -386,7 +401,10 @@ void MainWindow::timerTick() {
     if (progress >= 100)
         setTimeEstimate(1);
     int estimateTime = time/progress*(100 - progress);
-        setTimeEstimate(estimateTime);
+    if (prevTime < 1)
+        prevTime = estimateTime + 1;
+    prevTime = (estimateTime + prevTime)/2;
+    setTimeEstimate(prevTime);
 }
 
 void MainWindow::outDirChanged() {
@@ -481,8 +499,9 @@ void MainWindow::showQuestionMsg(QString question) {
     threadCopy->questionWait.wakeAll();
 }
 
-void MainWindow::run__Timer() {
+void MainWindow::runTimer() {
     time = 0;
+    prevTime = 0;
     timer->start();
 }
 

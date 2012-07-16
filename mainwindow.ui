@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>randcp 2.7.1</string>
+   <string>randcp 2.7.2</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
    <property name="spacing">
@@ -285,6 +285,13 @@
                <widget class="QPushButton" name="addDirIgnorButton">
                 <property name="text">
                  <string>Add dir...</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="addStrIgnorButton">
+                <property name="text">
+                 <string>Add string...</string>
                 </property>
                </widget>
               </item>
@@ -1199,6 +1206,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>addStrIgnorButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>addStringIgnoreList()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>407</x>
+     <y>373</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>236</x>
+     <y>258</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>selectOutputDir()</slot>
@@ -1230,5 +1253,6 @@
   <slot>outDirChanged()</slot>
   <slot>editSrcDirListLineEdit(QString)</slot>
   <slot>changeSettings()</slot>
+  <slot>addStringIgnoreList()</slot>
  </slots>
 </ui>

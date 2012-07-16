@@ -104,7 +104,7 @@ bool ThreadCopy::checkFileIgnore(QString file) {
     if (!enableIgnore)
         return true;
     for (int i=0; i < ignoreListWidget->count(); i++) {
-        wildcard.setPattern(QDir::fromNativeSeparators(
+        wildcard.setPattern(QDir::fromNativeSeparators("*" +
                           ignoreListWidget->item(i)->text()) + "*");
         if (wildcard.exactMatch(file)) {
             return false;

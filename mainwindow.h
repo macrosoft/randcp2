@@ -26,6 +26,7 @@ private:
 
     QString additionalPath;
     QString newSrcDir;
+    int prevTime;
     QModelIndex selectedIndexSrcList;
     Settings *settings;
     SrcDirItemModel *srcDirModel;
@@ -36,7 +37,7 @@ private:
     Ui::MainWindow *ui;
 
     void cancelScan();
-    QString getLastSelectedIgnoreDir();
+    QString getLastSelectedIgnore();
     QString listWidgetToSting(QListWidget *lw);
     void loadListWidgetFromString(QListWidget *lw, QString str);
     void loadSettings();
@@ -52,6 +53,7 @@ public slots:
     void addFileIgnoreList();
     void addFilterExt();
     void addSrcDir();
+    void addStringIgnoreList();
     void changeSettings();
     void delFilterExtList();
     void delIgnoreList();
@@ -81,7 +83,7 @@ public slots:
     void setEnabledFilter(bool enable);
     void setEnabledIgnore(bool enable);
     void showQuestionMsg(QString question);
-    void run__Timer();
+    void runTimer();
     void updateDiskFreeSpace();
 
 signals:

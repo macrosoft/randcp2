@@ -5,8 +5,8 @@
     <name>MainWindow</name>
     <message>
         <location filename="mainwindow.ui" line="14"/>
-        <source>randcp 2.7.1</source>
-        <oldsource>randcp 2.7</oldsource>
+        <source>randcp 2.7.2</source>
+        <oldsource>randcp 2.7.1</oldsource>
         <translation></translation>
     </message>
     <message>
@@ -41,14 +41,14 @@
     </message>
     <message>
         <location filename="mainwindow.ui" line="144"/>
-        <location filename="mainwindow.ui" line="297"/>
+        <location filename="mainwindow.ui" line="304"/>
         <source>Edit...</source>
         <translation>Править...</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="154"/>
         <location filename="mainwindow.ui" line="227"/>
-        <location filename="mainwindow.ui" line="307"/>
+        <location filename="mainwindow.ui" line="314"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
@@ -93,156 +93,177 @@
         <translation>Добавить каталог....</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="335"/>
+        <location filename="mainwindow.ui" line="294"/>
+        <source>Add string...</source>
+        <translation>Добавить строку...</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="342"/>
         <source>Other</source>
         <translation>Прочее</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="341"/>
+        <location filename="mainwindow.ui" line="348"/>
         <source>Mode</source>
         <translation>Режим</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="347"/>
+        <location filename="mainwindow.ui" line="354"/>
         <source>Shuffle</source>
         <translation>Копирование в случайном порядке</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="357"/>
+        <location filename="mainwindow.ui" line="364"/>
         <source>Synchronization</source>
         <translation>Синхронизация</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="412"/>
+        <location filename="mainwindow.ui" line="419"/>
         <source>Maximum number of files to copy:</source>
         <translation>Максимальное чило копируемых файлов:</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="422"/>
+        <location filename="mainwindow.ui" line="429"/>
         <source>Minimum free disk space (Mb):</source>
         <translation>Минимальное свободное место на диске (Мб):</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="429"/>
+        <location filename="mainwindow.ui" line="436"/>
         <source>Limit size of the copied files (Mb):</source>
         <translation>Ограничение размера копируемых файлов (Мб):</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="436"/>
+        <location filename="mainwindow.ui" line="443"/>
         <source>Maximum size of destination directory (Mb):</source>
         <translation>Максимальный размер выходной директории (Мб):</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="459"/>
+        <location filename="mainwindow.ui" line="466"/>
         <source>Run</source>
         <translation>Запуск</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="467"/>
+        <location filename="mainwindow.ui" line="474"/>
         <source>Files in queue: 0</source>
         <translation>Файлов в очереди: 0</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="474"/>
+        <location filename="mainwindow.ui" line="481"/>
         <source>Free disk space: 0</source>
         <translation>Свободное место: 0</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="481"/>
+        <location filename="mainwindow.ui" line="488"/>
         <source>Pause (ms):</source>
         <translation>Пауза (мс):</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="508"/>
+        <location filename="mainwindow.ui" line="515"/>
         <source>Time estimate:</source>
-        <translation type="unfinished">Осталось времени:</translation>
+        <translation>Осталось времени:</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="515"/>
-        <location filename="mainwindow.cpp" line="398"/>
+        <location filename="mainwindow.ui" line="522"/>
+        <location filename="mainwindow.cpp" line="192"/>
         <source>--:--</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="556"/>
-        <location filename="mainwindow.cpp" line="280"/>
+        <location filename="mainwindow.ui" line="563"/>
+        <location filename="mainwindow.cpp" line="310"/>
         <source>Start</source>
         <translation>Старт</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="597"/>
+        <location filename="mainwindow.ui" line="604"/>
         <source>Save</source>
         <translation>Сохранить</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="41"/>
+        <location filename="mainwindow.cpp" line="44"/>
         <source>***Scanning canceled!***</source>
         <translation>***Сканирование отменено!***</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="152"/>
+        <location filename="mainwindow.cpp" line="154"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="156"/>
+        <location filename="mainwindow.cpp" line="158"/>
         <source>Can&apos;t start copying files</source>
         <translation>Не могу начать копировать файлы</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="157"/>
+        <location filename="mainwindow.cpp" line="159"/>
         <source>Select the output directory</source>
         <translation>Выберите выходную директорию</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="168"/>
+        <location filename="mainwindow.cpp" line="170"/>
         <source>Select source directory</source>
         <translation>Выберите входную директорию</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="186"/>
-        <location filename="mainwindow.cpp" line="307"/>
+        <location filename="mainwindow.cpp" line="205"/>
+        <location filename="mainwindow.cpp" line="339"/>
         <source>Select ignore directory</source>
         <translation>Выберите игнорируемую директорию</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="200"/>
-        <location filename="mainwindow.cpp" line="311"/>
+        <location filename="mainwindow.cpp" line="219"/>
+        <location filename="mainwindow.cpp" line="343"/>
         <source>Select ignore file</source>
         <translation>Выбирите игнорируемый файл</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="273"/>
+        <location filename="mainwindow.cpp" line="247"/>
+        <location filename="mainwindow.cpp" line="346"/>
+        <source>Adding string</source>
+        <translation>Добавление строки</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="248"/>
+        <source>Add a new string to ignore list</source>
+        <translation>Добавьте новую строку в список игнорирования</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="303"/>
         <source>Files in queue: %1</source>
         <translation>Файлов в очереди: %1</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="281"/>
+        <location filename="mainwindow.cpp" line="313"/>
         <source>Done!</source>
         <translation>Готово!</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="376"/>
+        <location filename="mainwindow.cpp" line="347"/>
+        <source>Add a string to ignore list</source>
+        <translation>Добавьте строку в список игнорирования</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="426"/>
         <source>Scanning finnished.</source>
         <translation>Сканирование завершено.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="377"/>
+        <location filename="mainwindow.cpp" line="427"/>
         <source>Stop</source>
         <translation>Остановить</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="413"/>
+        <location filename="mainwindow.cpp" line="446"/>
         <source>Select output directory</source>
         <translation>Выберите выходную директорию</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="459"/>
+        <location filename="mainwindow.cpp" line="493"/>
         <source>Limit is reached</source>
         <translation>Лимит достигнут</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="469"/>
+        <location filename="mainwindow.cpp" line="510"/>
         <source>Free disk space: %1</source>
         <oldsource>Free disk space: </oldsource>
         <translation>Свободное место: %1</translation>
@@ -286,38 +307,38 @@
 <context>
     <name>ThreadCopy</name>
     <message>
-        <location filename="threadcopy.cpp" line="53"/>
+        <location filename="threadcopy.cpp" line="48"/>
         <source>Creating output directory</source>
         <translation>Создаю выходную директорию</translation>
     </message>
     <message>
-        <location filename="threadcopy.cpp" line="56"/>
+        <location filename="threadcopy.cpp" line="51"/>
         <source>Can not create output directory :(</source>
         <translation>Не удалось создать выходную директорию :(</translation>
     </message>
     <message>
-        <location filename="threadcopy.cpp" line="148"/>
+        <location filename="threadcopy.cpp" line="143"/>
         <source>***Stoped!***</source>
         <translation>***Остановлено!***</translation>
     </message>
     <message>
-        <location filename="threadcopy.cpp" line="160"/>
-        <location filename="threadcopy.cpp" line="209"/>
+        <location filename="threadcopy.cpp" line="155"/>
+        <location filename="threadcopy.cpp" line="203"/>
         <source>Remove %1</source>
         <translation>Удаляю %1</translation>
     </message>
     <message>
-        <location filename="threadcopy.cpp" line="174"/>
+        <location filename="threadcopy.cpp" line="169"/>
         <source>Copy %1</source>
         <translation>Копирую %1</translation>
     </message>
     <message>
-        <location filename="threadcopy.cpp" line="175"/>
+        <location filename="threadcopy.cpp" line="170"/>
         <source>to %2</source>
         <translation>в %2</translation>
     </message>
     <message>
-        <location filename="threadcopy.cpp" line="193"/>
+        <location filename="threadcopy.cpp" line="188"/>
         <source>The max file amount is reached.</source>
         <translation>Достигнут лимит максимального количества файлов.</translation>
     </message>
@@ -346,17 +367,17 @@
         <translation type="obsolete">Достигнут лимит максимального размера выходной директории.</translation>
     </message>
     <message>
-        <location filename="threadcopy.cpp" line="247"/>
+        <location filename="threadcopy.cpp" line="245"/>
         <source>Scanning directories: %1 of %2</source>
         <translation>Сканирование директорий: %1 из %2</translation>
     </message>
     <message>
-        <location filename="threadcopy.cpp" line="249"/>
+        <location filename="threadcopy.cpp" line="247"/>
         <source>Scanning: %1</source>
         <translation>Сканирование: %1</translation>
     </message>
     <message>
-        <location filename="threadcopy.cpp" line="251"/>
+        <location filename="threadcopy.cpp" line="249"/>
         <source>Files found: %1</source>
         <translation>Файлов найдено: %1</translation>
     </message>
