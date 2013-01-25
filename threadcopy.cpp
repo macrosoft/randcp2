@@ -27,7 +27,7 @@ ThreadCopy::ThreadCopy(Settings *pSettings, SrcDirItemModel *pSrcDirModel,
     #ifdef Q_OS_WIN
     wildcard.setCaseSensitivity(Qt::CaseInsensitive);
     #endif
-    wildcard.setPatternSyntax(QRegExp::Wildcard);
+    wildcard.setPatternSyntax(QRegExp::RegExp);
     allwaysTryOtherFile = false;
     progressCtrl = new ProgressControl(settings);
 }
@@ -92,7 +92,7 @@ bool ThreadCopy::checkFileFilter(QString file) {
     if (!enableFilter)
         return true;
     for (int i=0; i < filterListWidget->count(); i++) {
-        wildcard.setPattern("*." + filterListWidget->item(i)->text());
+        wildcard.setPattern(".*\\." + filterListWidget->item(i)->text());
         if (wildcard.exactMatch(file)) {
             return true;
         }
@@ -104,8 +104,9 @@ bool ThreadCopy::checkFileIgnore(QString file) {
     if (!enableIgnore)
         return true;
     for (int i=0; i < ignoreListWidget->count(); i++) {
-        wildcard.setPattern(QDir::fromNativeSeparators("*" +
-                          ignoreListWidget->item(i)->text()) + "*");
+        QString pattern = ".*" + QRegExp::escape(QDir::fromNativeSeparators(
+                    ignoreListWidget->item(i)->text())) + ".*";
+        wildcard.setPattern(pattern);
         if (wildcard.exactMatch(file)) {
             return false;
         }
