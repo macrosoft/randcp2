@@ -74,6 +74,7 @@ void MainWindow::loadListWidgetFromString(QListWidget *lw, QString str) {
     for (int i=0; i < list.count(); i++) {
         lw->addItem(list.at(i));
     }
+    lw->sortItems();
 }
 
 void MainWindow::loadSettings() {
@@ -211,6 +212,7 @@ void MainWindow::addDirIgnoreList() {
         ui->ignoreListWidget->addItem(item);
         ui->delIgnoreButton->setEnabled(false);
         ui->editIgnoreButton->setEnabled(false);
+        ui->ignoreListWidget->sortItems();
     }
 }
 
@@ -223,6 +225,7 @@ void MainWindow::addFileIgnoreList() {
                     QDir::toNativeSeparators(fileName));
         item->setFlags(item->flags() | Qt::ItemIsEditable);
         ui->ignoreListWidget->addItem(item);
+        ui->ignoreListWidget->sortItems();
     }
 }
 
@@ -251,6 +254,7 @@ void MainWindow::addStringIgnoreList() {
         QListWidgetItem *item = new QListWidgetItem(ignoreStr);
         item->setFlags(item->flags() | Qt::ItemIsEditable);
         ui->ignoreListWidget->addItem(item);
+        ui->ignoreListWidget->sortItems();
     }
 }
 

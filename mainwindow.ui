@@ -7,17 +7,26 @@
     <x>0</x>
     <y>0</y>
     <width>474</width>
-    <height>517</height>
+    <height>521</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>randcp 2.7.3</string>
+   <string>randcp 2.7.4</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
    <property name="spacing">
     <number>6</number>
    </property>
-   <property name="margin">
+   <property name="leftMargin">
+    <number>5</number>
+   </property>
+   <property name="topMargin">
+    <number>5</number>
+   </property>
+   <property name="rightMargin">
+    <number>5</number>
+   </property>
+   <property name="bottomMargin">
     <number>5</number>
    </property>
    <item>
@@ -582,7 +591,16 @@
       <property name="spacing">
        <number>6</number>
       </property>
-      <property name="margin">
+      <property name="leftMargin">
+       <number>5</number>
+      </property>
+      <property name="topMargin">
+       <number>5</number>
+      </property>
+      <property name="rightMargin">
+       <number>5</number>
+      </property>
+      <property name="bottomMargin">
        <number>5</number>
       </property>
       <item>
