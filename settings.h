@@ -3,14 +3,13 @@
 
 #include <QSettings>
 
-class Settings: public QObject
-{
+class Settings: public QObject {
     Q_OBJECT
 public:
     enum {OUTDIR, SRCDIR, SRCPATH, EN_EXTFILTER, EXTFILTER, EN_IGNOREFILTER,
           IGNOREFILTER, MODE, EN_MAXFILECOUNT, MAXFILECOUNT, EN_MINFREESPACE,
           MINFREESPACE, EN_LIMIT, SIZE_LIMIT, EN_MAXDST, MAXDST, KEYS_COUNT};
-    enum {SHUFFLE, SYNCHRONIZE};
+    enum {SHUFFLE_MODE, SYNCHRONIZE_MODE};
 
     Settings();
     ~Settings();

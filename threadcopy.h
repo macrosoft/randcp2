@@ -5,6 +5,7 @@
 #include <QtGui>
 #include <QFileInfo>
 #include <QHash>
+#include <QtWidgets>
 
 #include "progresscontrol.h"
 #include "settings.h"

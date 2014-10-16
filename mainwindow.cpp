@@ -92,7 +92,7 @@ void MainWindow::loadSettings() {
                 settings->getBool(Settings::EN_IGNOREFILTER));
     loadListWidgetFromString(ui->ignoreListWidget,
                              settings->getString(Settings::IGNOREFILTER));
-    if (settings->getInt(Settings::MODE, 0) == Settings::SHUFFLE)
+    if (settings->getInt(Settings::MODE, 0) == Settings::SHUFFLE_MODE)
         ui->rndModeRadioButton->setChecked(true);
     else
         ui->synchModeRadioButton->setChecked(true);

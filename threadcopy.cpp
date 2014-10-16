@@ -54,11 +54,11 @@ void ThreadCopy::run() {
         }
     }
     switch (settings->getInt(Settings::MODE)) {
-    case Settings::SHUFFLE:
+    case Settings::SHUFFLE_MODE:
         scan();
         copy();
         break;
-    case Settings::SYNCHRONIZE:
+    case Settings::SYNCHRONIZE_MODE:
         scanOutput(outputDir);
         scan();
         deleteOldFiles();
@@ -145,7 +145,7 @@ void ThreadCopy::copy() {
             break;
         }
         QString srcFile, dstFile;
-        if (settings->getInt(Settings::MODE) == Settings::SHUFFLE)
+        if (settings->getInt(Settings::MODE) == Settings::SHUFFLE_MODE)
             sourceFiles->getRndFile(srcFile, dstFile);
         else
             sourceFiles->getFirstFile(srcFile, dstFile);

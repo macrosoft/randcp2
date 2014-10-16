@@ -2,6 +2,7 @@
 #include <QDir>
 #include <QDragEnterEvent>
 #include <QUrl>
+#include <QMimeData>
 
 #include "droplistwidget.h"
 

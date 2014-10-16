@@ -2,7 +2,6 @@
 #define MAINWINDOW_H
 
 #include <QFileInfo>
-#include <QtGui/QListWidget>
 #include <QWidget>
 
 #include "settings.h"

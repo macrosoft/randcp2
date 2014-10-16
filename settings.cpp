@@ -83,7 +83,7 @@ void Settings::sync() {
 
 void Settings::setMode(bool mode) {
     if (mode)
-        setInt(MODE, SHUFFLE);
+        setInt(MODE, SHUFFLE_MODE);
     else
-        setInt(MODE, SYNCHRONIZE);
+        setInt(MODE, SYNCHRONIZE_MODE);
 }

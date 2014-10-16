@@ -2,6 +2,7 @@
 #include <QDragEnterEvent>
 #include <QFileInfo>
 #include <QUrl>
+#include <QMimeData>
 
 #include "droplineedit.h"
 
