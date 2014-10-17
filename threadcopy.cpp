@@ -41,7 +41,7 @@ ThreadCopy::~ThreadCopy() {
 //public
 
 void ThreadCopy::run() {
-    sourceFiles = new SourceFiles(srcDirModel);
+    sourceFiles = new SourceFiles(settings, srcDirModel);
     QFileInfo outDir(outputDir);
     if (!outDir.exists()) {
         if (outDir.dir().mkpath(outputDir)) {

@@ -4,6 +4,7 @@
 #include <QString>
 #include <QVector>
 
+#include "settings.h"
 #include "srcdiritemmodel.h"
 
 class SourceFile
@@ -23,9 +24,10 @@ class SourceFiles
 private:
     QVector<SourceFile*> files;
     SrcDirItemModel *srcDirModel;
+    Settings *settings;
 
 public:
-    SourceFiles(SrcDirItemModel *nSrcDirModel);
+    SourceFiles(Settings *pSettings, SrcDirItemModel *nSrcDirModel);
     void add(QString path, int dirIndex);
     QString getDstPath(QString path, int index);
     void getFile(QString &srcPath, QString &dstPath, int index);

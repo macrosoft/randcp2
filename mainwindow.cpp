@@ -96,6 +96,7 @@ void MainWindow::loadSettings() {
         ui->rndModeRadioButton->setChecked(true);
     else
         ui->synchModeRadioButton->setChecked(true);
+    ui->withoutDirTreeCheckBox->setChecked(settings->getBool(Settings::DIR_TREE));
     ui->fileCountCheckBox->setChecked(
                 settings->getBool(Settings::EN_MAXFILECOUNT));
     ui->fileCountSpinBox->setEnabled(
@@ -266,6 +267,8 @@ void MainWindow::changeSettings() {
     else if (s == ui->ignoreCheckBox)
         settings->setBool(Settings::EN_IGNOREFILTER,
                           ui->ignoreCheckBox->checkState());
+    else if (s == ui->withoutDirTreeCheckBox)
+        settings->setBool(Settings::DIR_TREE, ui->withoutDirTreeCheckBox->checkState());
     else if (s == ui->fileCountCheckBox)
         settings->setBool(Settings::EN_MAXFILECOUNT,
                           ui->fileCountCheckBox->checkState());

@@ -1,4 +1,5 @@
 #include <QTime>
+#include <QFileInfo>
 
 #include "sourcefiles.h"
 
@@ -16,7 +17,8 @@ QString SourceFile::getPath() {
     return path;
 }
 
-SourceFiles::SourceFiles(SrcDirItemModel *nSrcDirModel):
+SourceFiles::SourceFiles(Settings *pSettings, SrcDirItemModel *nSrcDirModel):
+    settings(pSettings),
     srcDirModel(nSrcDirModel) {
     qsrand(QTime::currentTime().msec());
 }
@@ -38,7 +40,17 @@ void SourceFiles::getFile(QString &srcPath, QString &dstPath, int index) {
     SourceFile *file = files.at(index);
     files.remove(index);
     srcPath = file->getPath();
-    dstPath = getDstPath(file->getPath(), file->getIndex());
+    if (settings->getBool(Settings::DIR_TREE)) {
+        dstPath = getDstPath(file->getPath(), file->getIndex());
+        dstPath.remove(0, 1);
+        dstPath.replace('/', ":::");
+        QRegExp re(":::.*:::");
+        dstPath.replace(re, ":::");
+        dstPath.replace(":::", " - ");
+        dstPath = '/' + dstPath;
+    } else {
+        dstPath = getDstPath(file->getPath(), file->getIndex());
+    }
 }
 
 void SourceFiles::getFirstFile(QString &srcPath, QString &dstPath) {

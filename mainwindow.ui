@@ -11,9 +11,9 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>randcp 2.7.4</string>
+   <string>randcp 2.7.5</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4">
+  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0">
    <property name="spacing">
     <number>6</number>
    </property>
@@ -203,6 +203,12 @@
        </item>
        <item>
         <widget class="QGroupBox" name="filterGroupBox">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>121</height>
+          </size>
+         </property>
          <property name="title">
           <string>Filter file extensions</string>
          </property>
@@ -213,7 +219,14 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_6">
             <item>
-             <widget class="DropExtListWidget" name="filterListWidget"/>
+             <widget class="DropExtListWidget" name="filterListWidget">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+             </widget>
             </item>
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -379,7 +392,7 @@
        </item>
        <item>
         <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="1">
+         <item row="1" column="1">
           <widget class="QSpinBox" name="fileCountSpinBox">
            <property name="enabled">
             <bool>false</bool>
@@ -392,17 +405,7 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="QDoubleSpinBox" name="freeSpaceSpinBox">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="maximum">
-            <double>1048576.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
+         <item row="3" column="1">
           <widget class="QDoubleSpinBox" name="limitSpinBox">
            <property name="enabled">
             <bool>false</bool>
@@ -412,7 +415,7 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
+         <item row="4" column="1">
           <widget class="QDoubleSpinBox" name="maxDstSpinBox">
            <property name="enabled">
             <bool>false</bool>
@@ -422,7 +425,17 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="0">
+         <item row="2" column="1">
+          <widget class="QDoubleSpinBox" name="freeSpaceSpinBox">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="maximum">
+            <double>1048576.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
           <widget class="QCheckBox" name="fileCountCheckBox">
            <property name="text">
             <string>Maximum number of files to copy:</string>
@@ -432,24 +445,31 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
+         <item row="2" column="0">
           <widget class="QCheckBox" name="minFreeSpaceCheckBox">
            <property name="text">
             <string>Minimum free disk space (Mb):</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
+         <item row="3" column="0">
           <widget class="QCheckBox" name="limitCheckBox">
            <property name="text">
             <string>Limit size of the copied files (Mb):</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
+         <item row="4" column="0">
           <widget class="QCheckBox" name="maxDstCheckBox">
            <property name="text">
             <string>Maximum size of destination directory (Mb):</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QCheckBox" name="withoutDirTreeCheckBox">
+           <property name="text">
+            <string>Without a directory tree</string>
            </property>
           </widget>
          </item>
@@ -1237,6 +1257,22 @@
     <hint type="destinationlabel">
      <x>236</x>
      <y>258</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>withoutDirTreeCheckBox</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>changeSettings()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>132</x>
+     <y>124</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>236</x>
+     <y>260</y>
     </hint>
    </hints>
   </connection>

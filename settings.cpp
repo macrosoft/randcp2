@@ -5,6 +5,7 @@ Settings::Settings() {
     keys[OUTDIR] = "outdir";
     keys[SRCDIR] = "srcdir";
     keys[SRCPATH] = "srcpath";
+    keys[DIR_TREE] = "withoutdirtree";
     keys[EN_EXTFILTER] = "enextfilter";
     keys[EXTFILTER] = "extfilter";
     keys[EN_IGNOREFILTER] = "enignorefilter";
